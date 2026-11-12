@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CommuNect | Barangay Community Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" data-page="home"
+        ><span class="brand-mark">C</span
+        ><span
+          >Commu<span class="brand-accent">Nect</span
+          ><small>BARANGAY COMMUNITY PORTAL</small></span
+        ></a
+      >
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Toggle navigation"
+      >
+        ☰
+      </button>
+      <nav id="mainNav">
+        <button class="nav-link active" data-page="home">Home</button>
+        <button class="nav-link" data-page="announcements">
+          Announcements
+        </button>
+        <button class="nav-link" data-page="concerns">Concerns</button>
+        <button class="nav-link" data-page="events">Events</button>
+        <button class="nav-link" data-page="assistance">Assistance</button>
+        <button class="nav-link" data-page="lostfound">Lost &amp; Found</button>
+        <button class="nav-link" data-page="feedback">Feedback</button>
+      </nav>
+      <div class="account-actions">
+        <span id="userGreeting" class="user-greeting"></span>
+        <button class="btn btn-outline btn-small" id="loginOpen">Log in</button>
+        <button class="btn btn-primary btn-small" id="registerOpen">
+          Register
+        </button>
+        <button class="btn btn-outline btn-small hidden" id="logoutBtn">
+          Log out
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="home" class="page active-page">
+        <div class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow"
+              ><span class="eyebrow-dot"></span> YOUR COMMUNITY, CONNECTED</span
+            >
+            <h1>A better barangay<br /><span>starts with us.</span></h1>
+            <p>
+              Stay informed, raise concerns, join activities, and connect with
+              your barangay through one community portal.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-go="concerns">
+                Report a concern <span>→</span>
+              </button>
+              <button class="btn btn-light" data-go="announcements">
+                View announcements
+              </button>
+            </div>
+            <div class="hero-note">
+              <span class="status-pulse"></span> One portal for residents and
+              barangay officials
+            </div>
+          </div>
+          <div class="hero-art">
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <div class="community-card">
+              <div class="community-icon">⌂</div>
+              <div>
+                <strong>Stronger together.</strong
+                ><span>Building a connected community</span>
+              </div>
+              <span class="community-check">✓</span>
+            </div>
+            <div class="floating-chip chip-top">
+              📢 &nbsp; Community updates
+            </div>
+            <div class="floating-chip chip-bottom">
+              🤝 &nbsp; Resident participation
+            </div>
+          </div>
+        </div>
+
+        <section class="section-wrap">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">QUICK ACCESS</span>
+              <h2>How can we help today?</h2>
+            </div>
+            <p>Choose a service to get started.</p>
+          </div>
+          <div class="quick-grid">
+            <button class="quick-card" data-go="announcements">
+              <span class="quick-icon purple">📢</span
+              ><strong>Announcements</strong
+              ><small>Advisories and updates</small
+              ><span class="card-arrow">↗</span>
+            </button>
+            <button class="quick-card" data-go="concerns">
+              <span class="quick-icon orange">📝</span
+              ><strong>Community concerns</strong
+              ><small>Submit and track reports</small
+              ><span class="card-arrow">↗</span>
+            </button>
+            <button class="quick-card" data-go="events">
+              <span class="quick-icon green">📅</span
+              ><strong>Events &amp; activities</strong
+              ><small>Join community programs</small
+              ><span class="card-arrow">↗</span>
+            </button>
+            <button class="quick-card" data-go="assistance">
+              <span class="quick-icon blue">🎓</span><strong>Assistance</strong
+              ><small>Programs and opportunities</small
+              ><span class="card-arrow">↗</span>
+            </button>
+            <button class="quick-card" data-go="lostfound">
+              <span class="quick-icon yellow">🔎</span
+              ><strong>Lost &amp; found</strong
+              ><small>Help return belongings</small
+              ><span class="card-arrow">↗</span>
+            </button>
+            <button class="quick-card" data-go="feedback">
+              <span class="quick-icon pink">💬</span><strong>Feedback</strong
+              ><small>Share your suggestions</small
+              ><span class="card-arrow">↗</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="section-wrap home-bottom">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">STAY UPDATED</span>
+              <h2>Latest announcements</h2>
+            </div>
+            <button class="text-button" data-go="announcements">
+              See all announcements →
+            </button>
+          </div>
+          <div id="homeAnnouncements" class="content-grid">
+            <div class="empty-state">Loading announcements...</div>
+          </div>
+        </section>
+        <section class="official-cta">
+          <div>
+            <span class="eyebrow">BARANGAY OFFICIALS</span>
+            <h2>Manage community services in one place.</h2>
+            <p>
+              Authorized officials can access reports, update concern statuses,
+              and review community activity.
+            </p>
+          </div>
+          <button class="btn btn-dark" data-go="officials">
+            Officials dashboard →
+          </button>
+        </section>
+      </section>
+
+      <section id="announcements" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">COMMUNITY INFORMATION</span>
+          <h1>Announcements</h1>
+          <p>Official barangay notices, schedules, and important advisories.</p>
+        </div>
+        <div class="section-wrap">
+          <div class="section-heading">
+            <div>
+              <h2>Latest updates</h2>
+              <p class="muted">
+                Check here for important community information.
+              </p>
+            </div>
+          </div>
+          <div id="announcementList" class="content-grid">
+            <div class="empty-state">Loading announcements...</div>
+          </div>
+        </div>
+        <div class="section-wrap official-only hidden">
+          <div class="form-card">
+            <h3>Post an announcement</h3>
+            <form id="announcementForm" class="form-grid">
+              <label>Title<input name="title" required maxlength="160" /></label
+              ><label
+                >Category<select name="category">
+                  <option>General</option>
+                  <option>Water Schedule</option>
+                  <option>Electricity Advisory</option>
+                  <option>Garbage Collection</option>
+                  <option>Disaster Advisory</option>
+                  <option>Community Event</option>
+                </select></label
+              ><label class="full"
+                >Details<textarea
+                  name="content"
+                  rows="4"
+                  required
+                ></textarea></label
+              ><button class="btn btn-primary">Publish announcement</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="concerns" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">YOUR VOICE MATTERS</span>
+          <h1>Community concerns</h1>
+          <p>
+            Submit a concern and follow its progress as barangay officials
+            provide updates.
+          </p>
+        </div>
+        <div class="section-wrap two-column">
+          <div class="form-card">
+            <span class="eyebrow">SUBMIT A REPORT</span>
+            <h2>Tell us what needs attention.</h2>
+            <p class="muted">
+              Please provide clear and accurate information. Avoid posting
+              private information about other people.
+            </p>
+            <form id="concernForm" class="form-grid">
+              <label
+                >Concern title<input
+                  name="title"
+                  required
+                  maxlength="160"
+                  placeholder="e.g. Uncollected garbage" /></label
+              ><label
+                >Category<select name="category" required>
+                  <option value="">Select a category</option>
+                  <option>Sanitation</option>
+                  <option>Road and Infrastructure</option>
+                  <option>Peace and Order</option>
+                  <option>Utilities</option>
+                  <option>Environment</option>
+                  <option>Other</option>
+                </select></label
+              ><label class="full"
+                >Location / area<input
+                  name="location"
+                  maxlength="180"
+                  placeholder="Street, purok, or nearby landmark" /></label
+              ><label class="full"
+                >Description<textarea
+                  name="description"
+                  rows="5"
+                  required
+                  placeholder="Describe the concern..."
+                ></textarea></label
+              ><button class="btn btn-primary">Submit concern</button>
+            </form>
+          </div>
+          <div class="side-panel">
+            <div class="side-panel-icon">🧭</div>
+            <h3>Track your submitted concerns</h3>
+            <p>
+              Log in to view your reports, check their status, and read updates
+              from barangay officials.
+            </p>
+            <button class="btn btn-outline" id="myConcernsBtn">
+              View my concerns
+            </button>
+            <div class="status-legend">
+              <span><i class="dot pending"></i> Pending</span
+              ><span><i class="dot progress"></i> In progress</span
+              ><span><i class="dot resolved"></i> Resolved</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-wrap">
+          <div class="section-heading">
+            <div>
+              <h2 id="concernListTitle">My concern reports</h2>
+              <p class="muted" id="concernListDescription">
+                Your submitted reports and their latest status.
+              </p>
+            </div>
+          </div>
+          <div id="myConcernList" class="stack-list">
+            <div class="empty-state">Log in to view your concerns.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="events" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">GET INVOLVED</span>
+          <h1>Events &amp; activities</h1>
+          <p>
+            Discover barangay meetings, sports events, clean-up drives, and
+            volunteer opportunities.
+          </p>
+        </div>
+        <div class="section-wrap">
+          <div class="section-heading">
+            <div>
+              <h2>Upcoming activities</h2>
+              <p class="muted">
+                Find an activity and participate in your community.
+              </p>
+            </div>
+          </div>
+          <div id="eventList" class="content-grid">
+            <div class="empty-state">Loading events...</div>
+          </div>
+        </div>
+        <div class="section-wrap official-only hidden">
+          <div class="form-card">
+            <h3>Create an event</h3>
+            <form id="eventForm" class="form-grid">
+              <label>Event title<input name="title" required /></label
+              ><label
+                >Event date<input
+                  type="datetime-local"
+                  name="event_date"
+                  required /></label
+              ><label>Location<input name="location" required /></label
+              ><label
+                >Maximum participants<input
+                  type="number"
+                  min="1"
+                  name="capacity" /></label
+              ><label class="full"
+                >Description<textarea
+                  name="description"
+                  rows="3"
+                  required
+                ></textarea></label
+              ><button class="btn btn-primary">Create event</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="assistance" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">PROGRAMS &amp; OPPORTUNITIES</span>
+          <h1>Assistance and opportunities</h1>
+          <p>
+            Explore scholarships, financial and livelihood assistance, feeding
+            programs, and other opportunities.
+          </p>
+        </div>
+        <div class="section-wrap">
+          <div class="info-strip">
+            Always review the eligibility requirements, required documents, and
+            application deadline provided in each program announcement.
+          </div>
+          <div id="assistanceList" class="content-grid">
+            <div class="empty-state">Loading programs...</div>
+          </div>
+        </div>
+        <div class="section-wrap official-only hidden">
+          <div class="form-card">
+            <h3>Post an assistance program</h3>
+            <form id="assistanceForm" class="form-grid">
+              <label>Program title<input name="title" required /></label
+              ><label
+                >Program type<select name="category">
+                  <option>Scholarship</option>
+                  <option>Financial Assistance</option>
+                  <option>Livelihood</option>
+                  <option>Feeding Program</option>
+                  <option>Other</option>
+                </select></label
+              ><label>Deadline<input type="date" name="deadline" /></label
+              ><label
+                >Eligibility<input
+                  name="eligibility"
+                  placeholder="Who may apply?" /></label
+              ><label class="full"
+                >Details<textarea
+                  name="description"
+                  rows="3"
+                  required
+                ></textarea></label
+              ><button class="btn btn-primary">Publish program</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="lostfound" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">HELP YOUR NEIGHBORS</span>
+          <h1>Lost &amp; found</h1>
+          <p>
+            Report lost or found belongings and help arrange their safe return.
+          </p>
+        </div>
+        <div class="section-wrap two-column">
+          <div class="form-card">
+            <span class="eyebrow">CREATE A LISTING</span>
+            <h2>Report an item</h2>
+            <form id="lostFoundForm" class="form-grid">
+              <label
+                >Listing type<select name="item_status">
+                  <option value="Lost">I lost an item</option>
+                  <option value="Found">I found an item</option>
+                </select></label
+              ><label>Item name<input name="item_name" required /></label
+              ><label
+                >Last seen / found location<input
+                  name="location"
+                  required /></label
+              ><label>Date<input type="date" name="date_reported" /></label
+              ><label class="full"
+                >Description<textarea
+                  name="description"
+                  rows="4"
+                  required
+                  placeholder="Describe the item without sharing sensitive personal details."
+                ></textarea></label
+              ><button class="btn btn-primary">Submit listing</button>
+            </form>
+          </div>
+          <div class="side-panel">
+            <div class="side-panel-icon">🔐</div>
+            <h3>Arrange a safe return</h3>
+            <p>
+              For everyone's safety, coordinate item returns through authorized
+              barangay personnel. Do not publish home addresses or sensitive
+              personal details.
+            </p>
+          </div>
+        </div>
+        <div class="section-wrap">
+          <div class="section-heading">
+            <div><h2>Recent listings</h2></div>
+          </div>
+          <div id="lostFoundList" class="content-grid">
+            <div class="empty-state">Loading listings...</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="feedback" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">HELP US IMPROVE</span>
+          <h1>Feedback &amp; suggestions</h1>
+          <p>
+            Share your experience with barangay services and suggest ways to
+            improve them.
+          </p>
+        </div>
+        <div class="section-wrap narrow">
+          <div class="form-card">
+            <span class="eyebrow">RESIDENT FEEDBACK</span>
+            <h2>Your feedback matters.</h2>
+            <form id="feedbackForm" class="form-grid">
+              <label
+                >Service / program<input
+                  name="service"
+                  required
+                  placeholder="e.g. Barangay clearance processing" /></label
+              ><label
+                >Rating<select name="rating" required>
+                  <option value="">Choose a rating</option>
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Good</option>
+                  <option value="3">3 - Fair</option>
+                  <option value="2">2 - Needs improvement</option>
+                  <option value="1">1 - Poor</option>
+                </select></label
+              ><label class="full"
+                >Feedback or suggestion<textarea
+                  name="comment"
+                  rows="5"
+                  required
+                ></textarea></label
+              ><button class="btn btn-primary">Send feedback</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="officials" class="page">
+        <div class="page-banner">
+          <span class="eyebrow">AUTHORIZED ACCESS</span>
+          <h1>Officials dashboard</h1>
+          <p>Monitor concerns, community activity, and service performance.</p>
+        </div>
+        <div class="section-wrap" id="officialDashboard">
+          <div class="dashboard-lock">
+            <div class="side-panel-icon">🛡️</div>
+            <h2>Officials access only</h2>
+            <p>
+              Please log in using an authorized official or administrator
+              account.
+            </p>
+            <button class="btn btn-primary" id="officialLoginBtn">
+              Log in
+            </button>
+          </div>
+          <div id="dashboardContent" class="hidden">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span>Total reports</span><strong id="statTotal">—</strong
+                ><small>All submitted concerns</small>
+              </div>
+              <div class="stat-card">
+                <span>Pending concerns</span><strong id="statPending">—</strong
+                ><small>Awaiting action</small>
+              </div>
+              <div class="stat-card">
+                <span>Resolved concerns</span
+                ><strong id="statResolved">—</strong
+                ><small>Marked resolved</small>
+              </div>
+              <div class="stat-card">
+                <span>Upcoming activities</span
+                ><strong id="statEvents">—</strong
+                ><small>Scheduled events</small>
+              </div>
+            </div>
+            <div class="dashboard-grid">
+              <div class="form-card">
+                <div class="section-heading">
+                  <div>
+                    <h3>Concern categories</h3>
+                    <p class="muted">Distribution of submitted reports.</p>
+                  </div>
+                </div>
+                <div id="categoryChart" class="bar-list">
+                  No analytics data yet.
+                </div>
+              </div>
+              <div class="form-card">
+                <h3>Recent concerns</h3>
+                <div id="officialConcernList" class="stack-list"></div>
+              </div>
+            </div>
+            <div class="form-card dashboard-table-wrap">
+              <h3>Manage concerns</h3>
+              <div id="manageConcernList" class="stack-list"></div>
+            </div>
+            <div class="form-card dashboard-table-wrap">
+              <div class="section-heading">
+                <div>
+                  <h3>Resident feedback</h3>
+                  <p class="muted">Feedback and suggestions submitted by residents.</p>
+                </div>
+                <button class="btn btn-outline btn-small" id="refreshFeedbackBtn" type="button">
+                  Refresh
+                </button>
+              </div>
+              <div id="officialFeedbackList" class="stack-list">
+                <div class="empty-state">Loading feedback...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand">
+        <span class="brand-mark">C</span><strong>CommuNect</strong>
+      </div>
+      <p>Connecting residents, strengthening communities.</p>
+      <small
+        >© <span id="year"></span> CommuNect · Barangay Community Portal</small
+      >
+    </footer>
+
+    <div class="modal-backdrop hidden" id="authModal">
+      <div class="modal">
+        <button class="modal-close" id="modalClose" aria-label="Close">
+          ×
+        </button>
+        <div class="modal-brand">
+          <span class="brand-mark">C</span><strong>CommuNect</strong>
+        </div>
+        <div class="auth-tabs" id="authTabs">
+          <button class="auth-tab active" data-auth="login">Log in</button
+          ><button class="auth-tab" data-auth="register">Create account</button>
+        </div>
+        <form id="loginForm" class="auth-form">
+          <h2>Welcome back.</h2>
+          <p class="muted">Log in to access your community portal.</p>
+          <label
+            >Email address<input type="email" name="email" required /></label
+          ><label
+            >Password<input type="password" name="password" required /></label
+          ><button class="btn btn-primary btn-block">Log in</button>
+        </form>
+        <form id="otpForm" class="auth-form hidden">
+          <h2 id="otpHeading">Check your email.</h2>
+          <p class="muted" id="otpDescription">
+            Enter the 6-digit verification code sent to your email address.
+          </p>
+          <button class="btn btn-outline btn-block hidden" id="sendOtpBtn" type="button">
+            Send OTP
+          </button>
+          <fieldset class="otp-field">
+            <legend>Verification code</legend>
+            <div class="otp-inputs" role="group" aria-label="6-digit verification code">
+              <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]" maxlength="1" aria-label="Digit 1 of 6" disabled required />
+              <input class="otp-digit" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]" maxlength="1" aria-label="Digit 2 of 6" disabled required />
+              <input class="otp-digit" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]" maxlength="1" aria-label="Digit 3 of 6" disabled required />
+              <input class="otp-digit" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]" maxlength="1" aria-label="Digit 4 of 6" disabled required />
+              <input class="otp-digit" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]" maxlength="1" aria-label="Digit 5 of 6" disabled required />
+              <input class="otp-digit" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]" maxlength="1" aria-label="Digit 6 of 6" disabled required />
+            </div>
+            <input type="hidden" name="otp" id="otpInput" />
+          </fieldset>
+          <div class="otp-actions">
+            <button class="btn btn-primary btn-block" id="otpSubmitBtn" disabled>
+              Verify and log in
+            </button>
+            <button class="btn btn-outline btn-block" id="otpBackBtn" type="button">
+              Back to login
+            </button>
+          </div>
+        </form>
+        <form id="registerForm" class="auth-form hidden">
+          <h2>Join your community.</h2>
+          <p class="muted">Create a resident account to get started.</p>
+          <label
+            >Full name<input name="full_name" required maxlength="120" /></label
+          ><label
+            >Email address<input type="email" name="email" required /></label
+          ><label
+            >Password<input
+              type="password"
+              name="password"
+              minlength="8"
+              required /></label
+          ><label
+            >Confirm password<input
+              type="password"
+              name="confirm_password"
+              minlength="8"
+              required /></label
+          ><button class="btn btn-primary btn-block">Create account</button
+          ><small class="muted"
+            >Public registration creates a resident account only.</small
+          >
+        </form>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status"></div>
+    <script src="js/app.js?v=20261112-dashboard-feedback"></script>
+  </body>
+</html>
