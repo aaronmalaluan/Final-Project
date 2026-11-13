@@ -8,13 +8,13 @@ The frontend and API need to share the same origin for session-based registratio
 2. Set **Build Command** to:
 
    ```text
-   npm ci --prefix backend
+   cd backend && npm ci
    ```
 
 3. Set **Start Command** to:
 
    ```text
-   npm --prefix backend start
+   cd backend && npm start
    ```
 
 4. Keep the existing database, session, and Gmail environment variables configured in Render, then deploy.
@@ -26,7 +26,7 @@ Registration first stores a temporary pending signup. The user then chooses **Se
 
 ### Configure Gmail OAuth
 
-1. In [Google Cloud Console](https://console.cloud.google.com/), create a project and configure the OAuth consent screen. If the app is in testing mode, add the Gmail sender as a test user.
+1. In [Google Cloud Console](https://console.cloud.google.com/), create a project, enable the **Gmail API**, and configure the OAuth consent screen. If the app is in testing mode, add the Gmail sender as a test user.
 2. Create an OAuth client ID for a **Web application** and add this authorized redirect URI exactly:
 
    ```text
@@ -43,4 +43,4 @@ Registration first stores a temporary pending signup. The user then chooses **Se
 5. Open the URL printed in the terminal, sign in as the Gmail sender, and approve access. The helper uses the `https://mail.google.com/` scope and exchanges the authorization code directly with Google. It prints the refresh token in the local terminal; add it as `GMAIL_REFRESH_TOKEN` in `backend/.env`. Do not share the token.
 6. Restart the backend.
 
-The OAuth credentials belong to the sender account. Users receive codes at the email address on their CommuNect account; they do not need to authorize Gmail themselves. Google may expire refresh tokens for OAuth apps left in testing mode, so a token that stops working may need to be generated again.
+OTP delivery uses the Gmail API over HTTPS. The OAuth credentials and refresh token must belong to the same sender account configured as `GMAIL_USER`. Users receive codes at the email address on their CommuNect account; they do not need to authorize Gmail themselves. Google may expire refresh tokens for OAuth apps left in testing mode, so a token that stops working may need to be generated again.

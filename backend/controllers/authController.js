@@ -173,9 +173,13 @@ exports.sendRegistrationOtp = async (req, res) => {
             );
         } catch (error) {
             if (error.code !== "OTP_DELIVERY_FAILED") throw error;
-            console.error("Registration OTP delivery failed:", error.cause.code || "unknown");
+            console.error(
+                "Registration OTP delivery failed:",
+                error.cause.code || "unknown",
+                error.cause.message
+            );
             return res.status(503).json({
-                message: "Could not send the verification code. Check the Gmail OAuth configuration."
+                message: "Could not send the verification code. Check the Gmail API and OAuth configuration."
             });
         }
 
