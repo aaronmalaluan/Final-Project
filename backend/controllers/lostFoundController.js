@@ -35,3 +35,26 @@ exports.createListing = async (req, res) => {
         res.status(500).json({ message: 'Unable to submit the listing.' });
     }
 };
+
+exports.deleteFoundListing = async (req, res) => {
+    const { id } = req.params;
+    if (!/^\d+$/.test(id) || Number(id) < 1) {
+        return res.status(400).json({ message: 'Invalid listing ID.' });
+    }
+
+    try {
+        const [result] = await db.execute(
+            `DELETE FROM lost_found
+             WHERE id = ? AND item_status = 'Found'`,
+            [id]
+        );
+        if (!result.affectedRows) {
+            return res.status(404).json({ message: 'Found listing not found.' });
+        }
+
+        res.json({ message: 'Found listing deleted.' });
+    } catch (error) {
+        console.error('Delete found listing error:', error);
+        res.status(500).json({ message: 'Unable to delete the found listing.' });
+    }
+};

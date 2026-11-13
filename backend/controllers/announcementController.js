@@ -59,6 +59,12 @@ exports.createAnnouncement = async (req, res) => {
 
 // OFFICIAL: DELETE ANNOUNCEMENT
 exports.deleteAnnouncement = async (req, res) => {
+    if (!/^\d+$/.test(req.params.id) || Number(req.params.id) < 1) {
+        return res.status(400).json({
+            message: 'Invalid announcement ID.'
+        });
+    }
+
     try {
         const [result] = await db.execute(
             'DELETE FROM announcements WHERE id = ?',

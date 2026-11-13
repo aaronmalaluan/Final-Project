@@ -28,11 +28,13 @@ function validId(value) {
 
 exports.getAllEvents = async (req, res) => {
     try {
+        const isOfficial = ['official', 'admin'].includes(req.session.role);
+        const dateFilter = isOfficial ? '' : 'WHERE e.event_date >= NOW()';
         const [events] = await db.execute(
             `SELECT e.*, COUNT(er.id) AS participant_count
              FROM events e
              LEFT JOIN event_registrations er ON er.event_id = e.id
-             WHERE e.event_date >= NOW()
+             ${dateFilter}
              GROUP BY e.id
              ORDER BY e.event_date ASC`
         );

@@ -7,5 +7,6 @@ const role = require('../middleware/roleMiddleware');
 
 router.get('/', controller.getPrograms);
 router.post('/', auth, role('official', 'admin'), controller.createProgram);
+router.delete('/:id', auth, role('official', 'admin'), controller.deleteProgram);
 
 module.exports = router;

@@ -71,23 +71,29 @@ Deploy both folders using the steps in [the backend Render deployment guide](../
 | Logout | POST | `/api/auth/logout` |
 | Public announcements | GET | `/api/announcements` |
 | Create announcement | POST | `/api/announcements` |
+| Delete announcement (official/admin) | DELETE | `/api/announcements/:id` |
 | Create concern | POST | `/api/concerns` |
 | My concerns | GET | `/api/concerns/my-reports` |
 | Official concern list | GET | `/api/concerns` |
 | Update concern status | PATCH | `/api/concerns/:id/status` |
+| Delete concern (official/admin) | DELETE | `/api/concerns/:id` |
 | Events | GET | `/api/events` |
 | Create event | POST | `/api/events` |
+| Delete event (official/admin) | DELETE | `/api/events/:id` |
 | Register for event | POST | `/api/events/:id/register` |
 | Assistance programs | GET | `/api/assistance` |
 | Create assistance program | POST | `/api/assistance` |
+| Delete assistance program (official/admin) | DELETE | `/api/assistance/:id` |
 | Lost and found | GET | `/api/lost-found` |
 | Create lost/found listing | POST | `/api/lost-found` |
+| Delete found listing (official/admin) | DELETE | `/api/lost-found/:id` |
 | Submit feedback | POST | `/api/feedback` |
 | Official feedback list | GET | `/api/feedback` |
 | Dashboard summary | GET | `/api/analytics/overview` |
 | Concerns by category | GET | `/api/analytics/concerns` |
 
 Official concern and feedback routes require an authenticated official or administrator account.
+Content deletion requires an authenticated official or administrator account. Lost-and-found deletion only applies to listings marked `Found`.
 
 ## 6. Session and CORS settings
 

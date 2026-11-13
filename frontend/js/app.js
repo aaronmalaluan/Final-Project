@@ -34,6 +34,24 @@ async function api(path, options = {}) {
 function escapeHTML(value = "") {
   return String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 }
+const DELETE_ENDPOINTS = {
+  announcement: "/announcements",
+  concern: "/concerns",
+  event: "/events",
+  assistance: "/assistance",
+  foundListing: "/lost-found"
+};
+const DELETE_LABELS = {
+  announcement: "announcement",
+  concern: "concern report",
+  event: "event",
+  assistance: "assistance program",
+  foundListing: "found listing"
+};
+function renderDeleteButton(type, id) {
+  if (!currentUser || !["official", "admin"].includes(currentUser.role)) return "";
+  return `<button class="btn btn-outline btn-small btn-delete" data-delete-type="${type}" data-delete-id="${escapeHTML(id)}">Delete</button>`;
+}
 function showPage(page) {
   $$(".page").forEach(el => el.classList.toggle("active-page", el.id === page));
   $$(".nav-link").forEach(el => el.classList.toggle("active", el.dataset.page === page));
@@ -135,7 +153,7 @@ async function loadAnnouncements() {
     const items = result.announcements || result.data || result || [];
     const html = Array.isArray(items) && items.length ? items.map(item => `
       <article class="content-card"><div class="meta">${escapeHTML(item.category || "Barangay update")} · ${formatDate(item.created_at)}</div>
-      <h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.content || item.description || "")}</p></article>`).join("") : '<div class="empty-state">No announcements have been posted yet.</div>';
+      <h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.content || item.description || "")}</p>${renderDeleteButton("announcement", item.id)}</article>`).join("") : '<div class="empty-state">No announcements have been posted yet.</div>';
     targets.forEach(el => el.innerHTML = html);
   } catch (err) { targets.forEach(el => el.innerHTML = `<div class="empty-state">${escapeHTML(err.message)}<br>ERROR 502.</div>`); }
 }
@@ -151,17 +169,17 @@ async function loadMyConcerns() {
     const result = await api(canViewAll ? "/concerns" : "/concerns/my-reports");
     const items = result.concerns || result.data || result || [];
     box.innerHTML = Array.isArray(items) && items.length ? items.map(item => `
-      <div class="list-item"><div><h4>${escapeHTML(item.title)}</h4><p>${escapeHTML(item.category || "General")} · ${escapeHTML(item.location || "")}</p>${item.resident_name ? `<p>Submitted by ${escapeHTML(item.resident_name)}</p>` : ""}<p>${escapeHTML(item.description || "")}</p></div><span class="pill ${statusClass(item.status)}">${escapeHTML(item.status || "Pending")}</span></div>`).join("") : `<div class="empty-state">${canViewAll ? "No concern reports have been submitted yet." : "You have not submitted any concerns yet."}</div>`;
+      <div class="list-item"><div><h4>${escapeHTML(item.title)}</h4><p>${escapeHTML(item.category || "General")} · ${escapeHTML(item.location || "")}</p>${item.resident_name ? `<p>Submitted by ${escapeHTML(item.resident_name)}</p>` : ""}<p>${escapeHTML(item.description || "")}</p></div><span class="pill ${statusClass(item.status)}">${escapeHTML(item.status || "Pending")}</span>${canViewAll ? renderDeleteButton("concern", item.id) : ""}</div>`).join("") : `<div class="empty-state">${canViewAll ? "No concern reports have been submitted yet." : "You have not submitted any concerns yet."}</div>`;
   } catch (err) { box.innerHTML = `<div class="empty-state">${escapeHTML(err.message)}</div>`; }
 }
 async function loadEvents() {
-  renderListFromApi("/events", "#eventList", items => items.map(item => `<article class="content-card"><div class="meta">📅 ${formatDate(item.event_date || item.date)}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p>📍 ${escapeHTML(item.location || "Location to be announced")}</p><button class="btn btn-outline btn-small" data-event-register="${item.id}">Register interest</button></article>`).join(""));
+  renderListFromApi("/events", "#eventList", items => items.map(item => `<article class="content-card"><div class="meta">📅 ${formatDate(item.event_date || item.date)}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p>📍 ${escapeHTML(item.location || "Location to be announced")}</p><button class="btn btn-outline btn-small" data-event-register="${item.id}">Register interest</button>${renderDeleteButton("event", item.id)}</article>`).join(""));
 }
 async function loadAssistance() {
-  renderListFromApi("/assistance", "#assistanceList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.category || "Community program")}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Eligibility:</strong> ${escapeHTML(item.eligibility || "See program details")}</p><p><strong>Deadline:</strong> ${formatDate(item.deadline)}</p></article>`).join(""));
+  renderListFromApi("/assistance", "#assistanceList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.category || "Community program")}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Eligibility:</strong> ${escapeHTML(item.eligibility || "See program details")}</p><p><strong>Deadline:</strong> ${formatDate(item.deadline)}</p>${renderDeleteButton("assistance", item.id)}</article>`).join(""));
 }
 async function loadLostFound() {
-  renderListFromApi("/lost-found", "#lostFoundList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.item_status || item.status || "Listing")}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p>📍 ${escapeHTML(item.location || "Location not specified")}</p></article>`).join(""));
+  renderListFromApi("/lost-found", "#lostFoundList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.item_status || item.status || "Listing")}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p>📍 ${escapeHTML(item.location || "Location not specified")}</p>${item.item_status === "Found" ? renderDeleteButton("foundListing", item.id) : ""}</article>`).join(""));
 }
 async function renderListFromApi(path, selector, render) {
   const box = $(selector);
@@ -206,7 +224,7 @@ async function loadDashboard() {
 function renderOfficialConcern(item) {
   const details = [item.category, item.location].filter(Boolean).map(escapeHTML).join(" · ");
   const submittedBy = item.resident_name ? `Submitted by ${escapeHTML(item.resident_name)}` : "Submitted by resident";
-  return `<div class="list-item"><div><h4>${escapeHTML(item.title)}</h4><p>${details || "General concern"}</p><p>${escapeHTML(item.description || "")}</p><p class="meta">${submittedBy} · ${formatDate(item.created_at)}</p></div><div class="status-actions"><select class="status-select" aria-label="Update concern status" data-status-id="${item.id}"><option ${item.status==="Pending"?"selected":""}>Pending</option><option ${item.status==="In Progress"?"selected":""}>In Progress</option><option ${item.status==="Resolved"?"selected":""}>Resolved</option></select><button class="btn btn-outline btn-small" data-update-id="${item.id}">Update</button></div></div>`;
+  return `<div class="list-item"><div><h4>${escapeHTML(item.title)}</h4><p>${details || "General concern"}</p><p>${escapeHTML(item.description || "")}</p><p class="meta">${submittedBy} · ${formatDate(item.created_at)}</p></div><div class="status-actions"><select class="status-select" aria-label="Update concern status" data-status-id="${item.id}"><option ${item.status==="Pending"?"selected":""}>Pending</option><option ${item.status==="In Progress"?"selected":""}>In Progress</option><option ${item.status==="Resolved"?"selected":""}>Resolved</option></select><button class="btn btn-outline btn-small" data-update-id="${item.id}">Update</button>${renderDeleteButton("concern", item.id)}</div></div>`;
 }
 async function loadFeedback() {
   const box = $("#officialFeedbackList");
@@ -376,6 +394,29 @@ $("#feedbackForm").addEventListener("submit", async e => {
   catch (err) { toast(err.message); }
 });
 document.addEventListener("click", async e => {
+  const deleteButton = e.target.closest("[data-delete-type]");
+  if (deleteButton) {
+    const type = deleteButton.dataset.deleteType;
+    const endpoint = DELETE_ENDPOINTS[type];
+    if (!endpoint || !window.confirm(`Delete this ${DELETE_LABELS[type]}? This action cannot be undone.`)) return;
+
+    try {
+      await api(`${endpoint}/${encodeURIComponent(deleteButton.dataset.deleteId)}`, { method: "DELETE" });
+      toast(`${DELETE_LABELS[type]} deleted.`);
+      if (type === "announcement") loadAnnouncements();
+      if (type === "concern") {
+        if ($("#concerns").classList.contains("active-page")) loadMyConcerns();
+        if ($("#officials").classList.contains("active-page")) loadDashboard();
+      }
+      if (type === "event") loadEvents();
+      if (type === "assistance") loadAssistance();
+      if (type === "foundListing") loadLostFound();
+    } catch (err) {
+      toast(err.message);
+    }
+    return;
+  }
+
   const register = e.target.closest("[data-event-register]");
   if (register) {
     if (!currentUser) return openAuth("login");

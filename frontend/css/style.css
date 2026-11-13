@@ -133,6 +133,16 @@ nav {
   background: #fff;
   color: var(--ink);
 }
+.btn-delete {
+  border-color: #efcaca;
+  color: #b42318;
+}
+.btn-delete:hover {
+  background: #fff5f5;
+}
+.content-card > .btn-delete {
+  margin-top: 10px;
+}
 .btn-light {
   background: #fff;
   color: var(--ink);

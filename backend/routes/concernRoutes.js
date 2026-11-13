@@ -32,4 +32,9 @@ router.patch('/:id/status',
     controller.updateConcernStatus
 );
 
+router.delete('/:id',
+    role('official', 'admin'),
+    controller.deleteConcern
+);
+
 module.exports = router;

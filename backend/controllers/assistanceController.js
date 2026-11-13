@@ -38,3 +38,25 @@ exports.createProgram = async (req, res) => {
         res.status(500).json({ message: 'Unable to publish the assistance program.' });
     }
 };
+
+exports.deleteProgram = async (req, res) => {
+    const { id } = req.params;
+    if (!/^\d+$/.test(id) || Number(id) < 1) {
+        return res.status(400).json({ message: 'Invalid assistance program ID.' });
+    }
+
+    try {
+        const [result] = await db.execute(
+            'DELETE FROM assistance_programs WHERE id = ?',
+            [id]
+        );
+        if (!result.affectedRows) {
+            return res.status(404).json({ message: 'Assistance program not found.' });
+        }
+
+        res.json({ message: 'Assistance program deleted.' });
+    } catch (error) {
+        console.error('Delete assistance program error:', error);
+        res.status(500).json({ message: 'Unable to delete the assistance program.' });
+    }
+};

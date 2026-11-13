@@ -174,6 +174,55 @@ exports.updateConcernStatus = async (req, res) => {
     }
 };
 
+// OFFICIAL: DELETE CONCERN
+exports.deleteConcern = async (req, res) => {
+    const { id } = req.params;
+    if (!/^\d+$/.test(id) || Number(id) < 1) {
+        return res.status(400).json({
+            message: 'Invalid concern ID.'
+        });
+    }
+
+    let connection;
+    try {
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+        await connection.execute(
+            'DELETE FROM concern_updates WHERE concern_id = ?',
+            [id]
+        );
+        const [result] = await connection.execute(
+            'DELETE FROM concerns WHERE id = ?',
+            [id]
+        );
+
+        if (!result.affectedRows) {
+            await connection.rollback();
+            return res.status(404).json({
+                message: 'Concern not found.'
+            });
+        }
+
+        await connection.commit();
+        res.json({
+            message: 'Concern deleted.'
+        });
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
+
+        console.error('Delete concern error:', error);
+        res.status(500).json({
+            message: 'Unable to delete the concern.'
+        });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+};
+
 // RESIDENT: VIEW CONCERN HISTORY
 exports.getConcernUpdates = async (req, res) => {
     try {
