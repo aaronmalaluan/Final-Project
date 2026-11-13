@@ -5,12 +5,20 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
+const db = require('./config/database');
 
 const app = express();
 
+const isProd = process.env.NODE_ENV === 'production';
+app.set('trust proxy', 1);
+
 // MIDDLEWARE
 app.use(cors({
-    origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+    origin: [
+        'http://localhost:5500',
+        'http://127.0.0.1:5500',
+        'https://aaronmalaluan.github.io'
+    ],
     credentials: true
 }));
 
@@ -18,15 +26,11 @@ app.use(express.json());
 
 // MYSQL SESSION STORE
 const sessionStore = new MySQLStore({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
     createDatabaseTable: true,
     schema: {
         tableName: 'sessions'
     }
-});
+}, db);
 
 app.use(session({
     name: 'connect.sid',
@@ -67,6 +71,11 @@ app.get('/', (req, res) => {
 // START SERVER
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`CommuNect running on port ${PORT}`);
 });
+
+server.on('error', (err) => console.error('Server error:', err));
+process.on('uncaughtException', (err) => console.error('Uncaught:', err));
+process.on('unhandledRejection', (err) => console.error('Unhandled:', err));
+process.on('exit', (code) => console.log('Process exiting with code', code));
