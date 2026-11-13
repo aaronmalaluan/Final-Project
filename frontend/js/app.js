@@ -1,7 +1,7 @@
 // Change this URL if your Express backend uses another host or port.
 const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
   ? "http://localhost:4000/api"
-  : "https://YOUR-SERVICE.onrender.com/api";
+  : "https://final-project-ea59.onrender.com/api";
 let currentUser = null;
 let otpPurpose = null;
 let otpSent = false;
