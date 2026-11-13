@@ -192,7 +192,16 @@ async function loadMyConcerns() {
     const result = await api(canViewAll ? "/concerns" : "/concerns/my-reports");
     const items = result.concerns || result.data || result || [];
     box.innerHTML = Array.isArray(items) && items.length ? items.map(item => `
-      <div class="list-item"><div><h4>${escapeHTML(item.title)}</h4><p>${escapeHTML(item.category || "General")} · ${escapeHTML(item.location || "")}</p>${item.resident_name ? `<p>Submitted by ${escapeHTML(item.resident_name)}</p>` : ""}<p>${escapeHTML(item.description || "")}</p></div><span class="pill ${statusClass(item.status)}">${escapeHTML(item.status || "Pending")}</span>${canViewAll ? renderDeleteButton("concern", item.id) : ""}</div>`).join("") : `<div class="empty-state">${canViewAll ? "No concern reports have been submitted yet." : "You have not submitted any concerns yet."}</div>`;
+      <div class="list-item concern-row">
+        <div>
+          <h4>${escapeHTML(item.title)}</h4>
+          <p>${escapeHTML(item.category || "General")} · ${escapeHTML(item.location || "")}</p>
+          ${item.resident_name ? `<p>Submitted by ${escapeHTML(item.resident_name)}</p>` : ""}
+          <p>${escapeHTML(item.description || "")}</p>
+        </div>
+        <span class="pill ${statusClass(item.status)}">${escapeHTML(item.status || "Pending")}</span>
+        <div class="concern-delete-slot">${canViewAll ? renderDeleteButton("concern", item.id) : ""}</div>
+      </div>`).join("") : `<div class="empty-state">${canViewAll ? "No concern reports have been submitted yet." : "You have not submitted any concerns yet."}</div>`;
   } catch (err) { box.innerHTML = `<div class="empty-state">${escapeHTML(err.message)}</div>`; }
 }
 async function loadEvents() {

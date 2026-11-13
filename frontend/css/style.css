@@ -654,6 +654,24 @@ nav {
   justify-content: space-between;
   gap: 15px;
 }
+.concern-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 80px;
+  align-items: center;
+  gap: 15px;
+}
+.concern-row > div:first-child {
+  min-width: 0;
+}
+.concern-row > .pill {
+  justify-self: center;
+  min-width: 100px;
+  text-align: center;
+}
+.concern-delete-slot {
+  display: flex;
+  justify-content: flex-end;
+}
 .list-item h4 {
   margin: 0 0 5px;
   font-size: 13px;
@@ -1162,6 +1180,20 @@ footer small {
   .list-item {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .concern-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+  .concern-row > div:first-child {
+    grid-column: 1 / -1;
+  }
+  .concern-row > .pill {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .concern-delete-slot {
+    grid-column: 2;
   }
   .status-actions {
     align-self: flex-end;
