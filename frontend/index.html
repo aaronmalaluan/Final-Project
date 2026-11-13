@@ -654,6 +654,28 @@
         </form>
       </div>
     </div>
+    <div
+      class="confirm-backdrop hidden"
+      id="deleteConfirmModal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="deleteConfirmTitle"
+      aria-describedby="deleteConfirmMessage"
+    >
+      <div class="confirm-dialog">
+        <div class="confirm-icon" aria-hidden="true">!</div>
+        <h2 id="deleteConfirmTitle">Confirm deletion</h2>
+        <p id="deleteConfirmMessage"></p>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" id="deleteConfirmCancel" type="button">
+            Cancel
+          </button>
+          <button class="btn btn-danger" id="deleteConfirmDelete" type="button">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
     <div id="toast" class="toast" role="status"></div>
     <script src="js/app.js?v=20261112-dashboard-feedback"></script>
   </body>

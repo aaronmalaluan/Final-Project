@@ -5,6 +5,7 @@ const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
 let currentUser = null;
 let otpPurpose = null;
 let otpSent = false;
+let pendingDelete = null;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -51,6 +52,28 @@ const DELETE_LABELS = {
 function renderDeleteButton(type, id) {
   if (!currentUser || !["official", "admin"].includes(currentUser.role)) return "";
   return `<button class="btn btn-outline btn-small btn-delete" data-delete-type="${type}" data-delete-id="${escapeHTML(id)}">Delete</button>`;
+}
+function openDeleteConfirmation(type, id, trigger) {
+  pendingDelete = { type, id, trigger };
+  $("#deleteConfirmMessage").textContent = `Delete this ${DELETE_LABELS[type]}? This action cannot be undone.`;
+  $("#deleteConfirmModal").classList.remove("hidden");
+  $("#deleteConfirmCancel").focus();
+}
+function closeDeleteConfirmation(restoreFocus = true) {
+  const trigger = pendingDelete && pendingDelete.trigger;
+  $("#deleteConfirmModal").classList.add("hidden");
+  pendingDelete = null;
+  if (restoreFocus && trigger && trigger.isConnected) trigger.focus();
+}
+function refreshAfterDelete(type) {
+  if (type === "announcement") loadAnnouncements();
+  if (type === "concern") {
+    if ($("#concerns").classList.contains("active-page")) loadMyConcerns();
+    if ($("#officials").classList.contains("active-page")) loadDashboard();
+  }
+  if (type === "event") loadEvents();
+  if (type === "assistance") loadAssistance();
+  if (type === "foundListing") loadLostFound();
 }
 function showPage(page) {
   $$(".page").forEach(el => el.classList.toggle("active-page", el.id === page));
@@ -249,6 +272,37 @@ $$("[data-go]").forEach(b => b.addEventListener("click", () => showPage(b.datase
 $("#menuToggle").addEventListener("click", () => $("#mainNav").classList.toggle("open"));
 $("#loginOpen").addEventListener("click", () => openAuth("login"));
 $("#registerOpen").addEventListener("click", () => openAuth("register"));
+$("#deleteConfirmCancel").addEventListener("click", () => closeDeleteConfirmation());
+$("#deleteConfirmModal").addEventListener("click", e => {
+  if (e.target.id === "deleteConfirmModal") closeDeleteConfirmation();
+});
+$("#deleteConfirmDelete").addEventListener("click", async () => {
+  if (!pendingDelete) return;
+
+  const { type, id } = pendingDelete;
+  const endpoint = DELETE_ENDPOINTS[type];
+  const confirmButton = $("#deleteConfirmDelete");
+  confirmButton.disabled = true;
+  confirmButton.textContent = "Deleting...";
+
+  try {
+    await api(`${endpoint}/${encodeURIComponent(id)}`, { method: "DELETE" });
+    closeDeleteConfirmation(false);
+    toast(`${DELETE_LABELS[type]} deleted.`);
+    refreshAfterDelete(type);
+  } catch (err) {
+    closeDeleteConfirmation();
+    toast(err.message);
+  } finally {
+    confirmButton.disabled = false;
+    confirmButton.textContent = "Delete";
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("#deleteConfirmModal").classList.contains("hidden")) {
+    closeDeleteConfirmation();
+  }
+});
 $("#officialLoginBtn").addEventListener("click", () => openAuth("login"));
 $("#modalClose").addEventListener("click", closeAuth);
 $("#authModal").addEventListener("click", e => { if (e.target.id === "authModal") closeAuth(); });
@@ -397,23 +451,8 @@ document.addEventListener("click", async e => {
   const deleteButton = e.target.closest("[data-delete-type]");
   if (deleteButton) {
     const type = deleteButton.dataset.deleteType;
-    const endpoint = DELETE_ENDPOINTS[type];
-    if (!endpoint || !window.confirm(`Delete this ${DELETE_LABELS[type]}? This action cannot be undone.`)) return;
-
-    try {
-      await api(`${endpoint}/${encodeURIComponent(deleteButton.dataset.deleteId)}`, { method: "DELETE" });
-      toast(`${DELETE_LABELS[type]} deleted.`);
-      if (type === "announcement") loadAnnouncements();
-      if (type === "concern") {
-        if ($("#concerns").classList.contains("active-page")) loadMyConcerns();
-        if ($("#officials").classList.contains("active-page")) loadDashboard();
-      }
-      if (type === "event") loadEvents();
-      if (type === "assistance") loadAssistance();
-      if (type === "foundListing") loadLostFound();
-    } catch (err) {
-      toast(err.message);
-    }
+    if (!DELETE_ENDPOINTS[type]) return;
+    openDeleteConfirmation(type, deleteButton.dataset.deleteId, deleteButton);
     return;
   }
 
