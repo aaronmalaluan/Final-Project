@@ -143,6 +143,10 @@ nav {
 .content-card > .btn-delete {
   margin-top: 10px;
 }
+.content-card [data-event-register] + .btn-delete {
+  margin-top: 0;
+  margin-left: 8px;
+}
 .btn-light {
   background: #fff;
   color: var(--ink);
