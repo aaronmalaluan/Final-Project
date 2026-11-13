@@ -91,6 +91,16 @@ exports.createEvent = async (req, res) => {
     }
 
     try {
+        const [[dateCheck]] = await db.execute(
+            'SELECT CAST(? AS DATETIME) > NOW() AS is_future',
+            [eventDate]
+        );
+        if (!dateCheck.is_future) {
+            return res.status(400).json({
+                message: 'Choose a future date and time. Past events do not appear in Upcoming activities.'
+            });
+        }
+
         const [result] = await db.execute(
             `INSERT INTO events
              (organizer_id, title, description, location, event_date, registration_deadline, capacity)
