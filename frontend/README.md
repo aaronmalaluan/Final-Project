@@ -26,10 +26,12 @@ Final-Project-WST/
 Open `frontend/js/app.js`. At the top, check:
 
 ```js
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
+  ? `http://${location.hostname}:4000/api`
+  : "/api";
 ```
 
-This must match the port and API prefix used in your Express `server.js`.
+For local development this uses the local Express server on port 4000. For the public deployment, it uses `/api` on the same origin that serves the frontend.
 
 ## 3. Start MySQL and backend
 
@@ -39,7 +41,7 @@ This must match the port and API prefix used in your Express `server.js`.
 4. Run `npm.cmd install` if dependencies have not been installed in this folder.
 5. Configure Gmail OAuth in `backend/.env` as described in [the backend setup guide](../backend/README.md).
 6. Run `npm.cmd run dev` if your package.json has a `dev` script, or `npm.cmd start` if it has a `start` script.
-7. Confirm the terminal says the server is running on port 3000.
+7. Confirm the terminal says the server is running on port 4000.
 
 ## 4. Run the frontend
 
@@ -48,10 +50,14 @@ Recommended: in VS Code, install the **Live Server** extension.
 1. Open the whole `Final-Project-WST` folder in VS Code.
 2. Right-click `frontend/index.html`.
 3. Select **Open with Live Server**.
-4. The page usually opens at `http://127.0.0.1:5500`.
+4. The page usually opens at `http://127.0.0.1:5500`. The API URL uses the same hostname.
 5. Your backend CORS configuration must allow the exact Live Server origin.
 
 Do not open the HTML file by double-clicking it if you are using session login. Use Live Server.
+
+## Public deployment
+
+Deploy both folders using the steps in [the backend Render deployment guide](../backend/README.md#deploy-the-complete-app-on-render). Open the Render service URL for the public app; GitHub Pages is a separate site and will not share the API's session cookie.
 
 ## 5. API routes expected by this frontend
 
@@ -103,7 +109,7 @@ Your session cookie should support local development, and the frontend fetch hel
 credentials: "include"
 ```
 
-Never publish your `.env` file or real passwords. For production, use HTTPS, secure cookies, and appropriate CSRF protection.
+Never publish your `.env` file or real passwords. For production, use HTTPS, secure cookies, and appropriate CSRF protection. The public frontend and API should remain on the same origin for session-based authentication.
 
 ## 7. Quick connection test
 

@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
+const path = require('path');
 const db = require('./config/database');
 
 const app = express();
@@ -63,10 +64,7 @@ app.use('/api/lost-found', require('./routes/lostFoundRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
-// HOME ROUTE
-app.get('/', (req, res) => {
-    res.send('CommuNect API is running!');
-});
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // START SERVER
 const PORT = process.env.PORT || 3000;

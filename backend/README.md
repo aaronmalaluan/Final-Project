@@ -1,5 +1,25 @@
 # Backend setup
 
+## Deploy the complete app on Render
+
+The frontend and API need to share the same origin for session-based registration and login to work reliably. Configure the existing Render web service to include both project folders:
+
+1. In Render, set **Root Directory** to the repository root (leave it blank), not `backend`.
+2. Set **Build Command** to:
+
+   ```text
+   npm ci --prefix backend
+   ```
+
+3. Set **Start Command** to:
+
+   ```text
+   npm --prefix backend start
+   ```
+
+4. Keep the existing database, session, and Gmail environment variables configured in Render, then deploy.
+5. Use the Render service URL (for example, `https://final-project-ea59.onrender.com`) as the public app link. The root URL now serves the frontend and `/api` serves the API. Do not use the GitHub Pages URL for session-based registration.
+
 ## Gmail OAuth for verification codes
 
 Registration first stores a temporary pending signup. The user then chooses **Send OTP** and the account is created only after the email address is verified. Login uses the account email and password without an OTP. Registration codes expire after 5 minutes, allow 5 attempts, and can be resent after a 60-second cooldown.
