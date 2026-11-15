@@ -44,7 +44,7 @@ function singleLineHeader(value, name) {
     return value;
 }
 
-async function sendVerificationCode(recipient, code) {
+async function sendVerificationCode(recipient, code, purpose = "verification") {
     const requiredConfig = [
         "GMAIL_USER",
         "GMAIL_CLIENT_ID",
@@ -74,14 +74,17 @@ async function sendVerificationCode(recipient, code) {
         throw new Error("Google OAuth response did not contain an access token.");
     }
 
+    const isPasswordReset = purpose === "password_reset";
     const message = [
         `From: CommuNect <${sender}>`,
         `To: ${destination}`,
-        "Subject: Your CommuNect verification code",
+        `Subject: Your CommuNect ${isPasswordReset ? "password reset" : "verification"} code`,
         "MIME-Version: 1.0",
         "Content-Type: text/plain; charset=UTF-8",
         "",
-        `Your verification code is ${code}. It expires in 5 minutes. If you did not try to log in, you can ignore this email.`
+        isPasswordReset
+            ? `Your password reset code is ${code}. It expires in 5 minutes. If you did not request a password reset, you can ignore this email.`
+            : `Your verification code is ${code}. It expires in 5 minutes. If you did not try to log in, you can ignore this email.`
     ].join("\r\n");
 
     const sendResponse = await fetch(

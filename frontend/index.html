@@ -588,6 +588,55 @@
           ><label
             >Password<input type="password" name="password" required /></label
           ><button class="btn btn-primary btn-block">Log in</button>
+          <button class="text-button forgot-password-link" id="forgotPasswordOpen" type="button">
+            Forgot password?
+          </button>
+        </form>
+        <form id="forgotPasswordForm" class="auth-form hidden">
+          <h2>Reset your password.</h2>
+          <p class="muted">
+            Enter your email address and, if an account exists, we'll send a reset code.
+          </p>
+          <label
+            >Email address<input type="email" name="email" id="forgotPasswordEmail" required /></label
+          ><button class="btn btn-primary btn-block">Send reset code</button>
+          <button class="btn btn-outline btn-block auth-secondary-action" id="forgotPasswordBack" type="button">
+            Back to log in
+          </button>
+        </form>
+        <form id="resetPasswordForm" class="auth-form hidden">
+          <h2>Choose a new password.</h2>
+          <p class="muted" id="resetPasswordDescription">
+            Enter the reset code from your email and choose a new password.
+          </p>
+          <input type="hidden" name="email" id="resetPasswordEmail" />
+          <label
+            >Reset code<input
+              type="text"
+              name="otp"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern="[0-9]{6}"
+              maxlength="6"
+              required /></label
+          ><label
+            >New password<input
+              type="password"
+              name="password"
+              minlength="8"
+              autocomplete="new-password"
+              required /></label
+          ><label
+            >Confirm new password<input
+              type="password"
+              name="confirm_password"
+              minlength="8"
+              autocomplete="new-password"
+              required /></label
+          ><button class="btn btn-primary btn-block">Reset password</button>
+          <button class="btn btn-outline btn-block auth-secondary-action" id="resetPasswordBack" type="button">
+            Back to email entry
+          </button>
         </form>
         <form id="otpForm" class="auth-form hidden">
           <h2 id="otpHeading">Check your email.</h2>
@@ -667,6 +716,6 @@
       </div>
     </div>
     <div id="toast" class="toast" role="status"></div>
-    <script src="js/app.js?v=20261112-dashboard-feedback"></script>
+    <script src="js/app.js?v=20261115-password-reset"></script>
   </body>
 </html>

@@ -8,6 +8,10 @@ const OTP_LIFETIME_MS = 5 * 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
 const REGISTRATION_LIFETIME_MS = 30 * 60 * 1000;
 const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
+const PASSWORD_RESET_RESPONSE_MESSAGE =
+    "If an account exists for that email, check the inbox for a password reset code.";
+const PASSWORD_RESET_INVALID_MESSAGE =
+    "Invalid or expired password reset details. Request a new code and try again.";
 
 function saveSession(session) {
     return new Promise((resolve, reject) => {
@@ -25,13 +29,28 @@ function hashOtp(code) {
     return crypto.createHash("sha256").update(code).digest("hex");
 }
 
-async function createOtpChallenge(req, purpose, data, recipient, regenerate = false) {
+function isValidOtp(code, pendingOtp) {
+    if (!/^\d{6}$/.test(code)) return false;
+    const storedHash = Buffer.from(pendingOtp.codeHash, "hex");
+    const submittedHash = Buffer.from(hashOtp(code), "hex");
+    return storedHash.length === submittedHash.length &&
+        crypto.timingSafeEqual(storedHash, submittedHash);
+}
+
+async function createOtpChallenge(
+    req,
+    purpose,
+    data,
+    recipient,
+    regenerate = false,
+    sessionKey = "pendingOtp"
+) {
     if (regenerate) {
         await regenerateSession(req.session);
     }
 
     const code = crypto.randomInt(100000, 1000000).toString();
-    req.session.pendingOtp = {
+    req.session[sessionKey] = {
         ...data,
         purpose,
         codeHash: hashOtp(code),
@@ -41,9 +60,9 @@ async function createOtpChallenge(req, purpose, data, recipient, regenerate = fa
     await saveSession(req.session);
 
     try {
-        await sendVerificationCode(recipient, code);
+        await sendVerificationCode(recipient, code, purpose);
     } catch (error) {
-        delete req.session.pendingOtp;
+        delete req.session[sessionKey];
         await saveSession(req.session);
         const deliveryError = new Error("Verification code delivery failed.");
         deliveryError.code = "OTP_DELIVERY_FAILED";
@@ -198,6 +217,138 @@ exports.sendRegistrationOtp = async (req, res) => {
 };
 
 
+// REQUEST PASSWORD RESET
+exports.requestPasswordReset = async (req, res) => {
+    try {
+        const email = req.body && typeof req.body.email === "string"
+            ? req.body.email.trim()
+            : "";
+        if (!email || email.length > 150) {
+            return res.status(400).json({
+                message: "Enter a valid email address."
+            });
+        }
+
+        const now = Date.now();
+        const cooldownRemaining =
+            OTP_RESEND_COOLDOWN_MS - (now - (req.session.passwordResetLastSentAt || 0));
+        if (cooldownRemaining > 0) {
+            return res.status(429).json({
+                message: `Please wait ${Math.ceil(cooldownRemaining / 1000)} seconds before requesting another code.`
+            });
+        }
+
+        req.session.passwordResetLastSentAt = now;
+        delete req.session.pendingPasswordReset;
+        await saveSession(req.session);
+
+        const [users] = await db.execute(
+            "SELECT id, email FROM users WHERE email = ?",
+            [email]
+        );
+        if (users.length > 0) {
+            try {
+                await createOtpChallenge(
+                    req,
+                    "password_reset",
+                    { userId: users[0].id, email: users[0].email },
+                    users[0].email,
+                    false,
+                    "pendingPasswordReset"
+                );
+            } catch (error) {
+                if (error.code !== "OTP_DELIVERY_FAILED") throw error;
+                console.error(
+                    "Password reset code delivery failed:",
+                    error.cause && error.cause.code || "unknown"
+                );
+            }
+        }
+
+        return res.status(202).json({
+            message: PASSWORD_RESET_RESPONSE_MESSAGE
+        });
+    } catch (error) {
+        console.error("Could not start password reset:", error.code || "unknown");
+        return res.status(500).json({
+            message: "Could not start password reset. Please try again."
+        });
+    }
+};
+
+// RESET PASSWORD
+exports.resetPassword = async (req, res) => {
+    try {
+        const email = req.body && typeof req.body.email === "string"
+            ? req.body.email.trim()
+            : "";
+        const code = req.body && typeof req.body.otp === "string"
+            ? req.body.otp.trim()
+            : "";
+        const password = req.body && typeof req.body.password === "string"
+            ? req.body.password
+            : "";
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters."
+            });
+        }
+
+        const pendingReset = req.session.pendingPasswordReset;
+        if (!pendingReset || pendingReset.purpose !== "password_reset") {
+            return res.status(401).json({
+                message: PASSWORD_RESET_INVALID_MESSAGE
+            });
+        }
+
+        if (Date.now() > pendingReset.expiresAt) {
+            delete req.session.pendingPasswordReset;
+            await saveSession(req.session);
+            return res.status(401).json({
+                message: PASSWORD_RESET_INVALID_MESSAGE
+            });
+        }
+
+        const isValidRequest = email === pendingReset.email &&
+            isValidOtp(code, pendingReset);
+        if (!isValidRequest) {
+            pendingReset.attempts += 1;
+            const attemptsRemaining = OTP_MAX_ATTEMPTS - pendingReset.attempts;
+            if (attemptsRemaining <= 0) {
+                delete req.session.pendingPasswordReset;
+            }
+            await saveSession(req.session);
+            return res.status(401).json({
+                message: PASSWORD_RESET_INVALID_MESSAGE
+            });
+        }
+
+        const passwordHash = await bcrypt.hash(password, 10);
+        delete req.session.pendingPasswordReset;
+        await saveSession(req.session);
+
+        const [result] = await db.execute(
+            "UPDATE users SET password = ? WHERE id = ? AND email = ?",
+            [passwordHash, pendingReset.userId, pendingReset.email]
+        );
+        if (result.affectedRows !== 1) {
+            return res.status(401).json({
+                message: PASSWORD_RESET_INVALID_MESSAGE
+            });
+        }
+
+        return res.json({
+            message: "Password reset successfully. Log in with your new password."
+        });
+    } catch (error) {
+        console.error("Password reset failed:", error.code || "unknown");
+        return res.status(500).json({
+            message: "Could not reset the password. Please try again."
+        });
+    }
+};
+
 // LOGIN
 exports.login = async (req, res) => {
     try {
@@ -286,15 +437,7 @@ exports.verifyOtp = async (req, res) => {
 
         const code =
             req.body && typeof req.body.otp === "string" ? req.body.otp.trim() : "";
-        const submittedHash = hashOtp(code);
-        const storedHash = Buffer.from(pendingOtp.codeHash, "hex");
-        const submittedHashBuffer = Buffer.from(submittedHash, "hex");
-        const isValidCode =
-            /^\d{6}$/.test(code) &&
-            storedHash.length === submittedHashBuffer.length &&
-            crypto.timingSafeEqual(storedHash, submittedHashBuffer);
-
-        if (!isValidCode) {
+        if (!isValidOtp(code, pendingOtp)) {
             pendingOtp.attempts += 1;
             const attemptsRemaining = OTP_MAX_ATTEMPTS - pendingOtp.attempts;
             if (attemptsRemaining <= 0) {

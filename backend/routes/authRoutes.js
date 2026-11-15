@@ -10,6 +10,8 @@ router.post("/register/send-otp", authController.sendRegistrationOtp);
 
 // Login
 router.post("/login", authController.login);
+router.post("/forgot-password", authController.requestPasswordReset);
+router.post("/reset-password", authController.resetPassword);
 
 // Verify the email code sent during login
 router.post("/verify-otp", authController.verifyOtp);

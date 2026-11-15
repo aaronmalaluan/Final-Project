@@ -66,6 +66,8 @@ Deploy both folders using the steps in [the backend Render deployment guide](../
 | Begin registration | POST | `/api/auth/register` |
 | Send or resend registration OTP | POST | `/api/auth/register/send-otp` |
 | Login with email and password | POST | `/api/auth/login` |
+| Request a password reset code | POST | `/api/auth/forgot-password` |
+| Reset password with email code | POST | `/api/auth/reset-password` |
 | Verify registration code | POST | `/api/auth/verify-otp` |
 | Current session | GET | `/api/auth/me` |
 | Logout | POST | `/api/auth/logout` |

@@ -928,6 +928,14 @@ nav {
 .auth-form > p {
   margin: 0 0 18px;
 }
+.forgot-password-link {
+  display: block;
+  margin: 10px 0 0 auto;
+  padding: 0;
+}
+.auth-secondary-action {
+  margin-top: 9px;
+}
 .auth-form label {
   margin-bottom: 13px;
 }

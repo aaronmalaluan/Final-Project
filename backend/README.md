@@ -22,7 +22,7 @@ The frontend and API need to share the same origin for session-based registratio
 
 ## Gmail OAuth for verification codes
 
-Registration first stores a temporary pending signup. The user then chooses **Send OTP** and the account is created only after the email address is verified. Login uses the account email and password without an OTP. Registration codes expire after 5 minutes, allow 5 attempts, and can be resent after a 60-second cooldown.
+Registration first stores a temporary pending signup. The user then chooses **Send OTP** and the account is created only after the email address is verified. Login uses the account email and password without an OTP. Registration and password-reset codes expire after 5 minutes, allow 5 attempts, and can be requested again after a 60-second cooldown. Password reset requests use the account email and do not reveal whether an account exists.
 
 ### Configure Gmail OAuth
 

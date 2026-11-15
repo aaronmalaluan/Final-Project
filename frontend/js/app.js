@@ -115,6 +115,8 @@ function setAuthTab(mode) {
   $$(".auth-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.auth === mode));
   $("#loginForm").classList.toggle("hidden", mode !== "login");
   $("#registerForm").classList.toggle("hidden", mode !== "register");
+  $("#forgotPasswordForm").classList.add("hidden");
+  $("#resetPasswordForm").classList.add("hidden");
   $("#otpForm").classList.add("hidden");
   $("#sendOtpBtn").classList.add("hidden");
   setOtpDigitInputsDisabled(true);
@@ -126,6 +128,8 @@ function showOtpChallenge(purpose, message, hasCode) {
   $("#authTabs").classList.add("hidden");
   $("#loginForm").classList.add("hidden");
   $("#registerForm").classList.add("hidden");
+  $("#forgotPasswordForm").classList.add("hidden");
+  $("#resetPasswordForm").classList.add("hidden");
   $("#otpForm").classList.remove("hidden");
   $("#otpHeading").textContent = purpose === "register" ? "Verify your email." : "Check your email.";
   $("#otpDescription").textContent = message;
@@ -316,6 +320,18 @@ $("#officialLoginBtn").addEventListener("click", () => openAuth("login"));
 $("#modalClose").addEventListener("click", closeAuth);
 $("#authModal").addEventListener("click", e => { if (e.target.id === "authModal") closeAuth(); });
 $$(".auth-tab").forEach(tab => tab.addEventListener("click", () => setAuthTab(tab.dataset.auth)));
+$("#forgotPasswordOpen").addEventListener("click", () => {
+  $("#forgotPasswordEmail").value = $("#loginForm input[name='email']").value;
+  $("#authTabs").classList.add("hidden");
+  $("#loginForm").classList.add("hidden");
+  $("#forgotPasswordForm").classList.remove("hidden");
+});
+$("#forgotPasswordBack").addEventListener("click", () => setAuthTab("login"));
+$("#resetPasswordBack").addEventListener("click", () => {
+  $("#forgotPasswordEmail").value = $("#resetPasswordEmail").value;
+  $("#resetPasswordForm").classList.add("hidden");
+  $("#forgotPasswordForm").classList.remove("hidden");
+});
 $("#otpBackBtn").addEventListener("click", () => {
   const returnTab = otpPurpose === "register" ? "register" : "login";
   $("#otpForm").reset();
@@ -391,6 +407,49 @@ $("#loginForm").addEventListener("submit", async e => {
     toast(result.message || "Login successful.");
     showPage("home");
   } catch (err) { toast(err.message); }
+});
+$("#forgotPasswordForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = formObject(e.target).email.trim();
+  try {
+    const result = await api("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+    $("#resetPasswordForm").reset();
+    $("#resetPasswordEmail").value = email;
+    $("#resetPasswordDescription").textContent = result.message;
+    $("#forgotPasswordForm").classList.add("hidden");
+    $("#resetPasswordForm").classList.remove("hidden");
+    $("#resetPasswordForm input[name='otp']").focus();
+    toast(result.message);
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#resetPasswordForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const data = formObject(e.target);
+  if (data.password !== data.confirm_password) {
+    toast("Passwords do not match.");
+    return;
+  }
+
+  const email = data.email;
+  delete data.confirm_password;
+  try {
+    const result = await api("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+    e.target.reset();
+    $("#loginForm input[name='email']").value = email;
+    $("#loginForm input[name='password']").value = "";
+    setAuthTab("login");
+    toast(result.message);
+  } catch (err) {
+    toast(err.message);
+  }
 });
 $("#otpForm").addEventListener("submit", async e => {
   e.preventDefault();
