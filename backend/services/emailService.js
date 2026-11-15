@@ -88,8 +88,7 @@ async function sendVerificationCode(recipient, code, purpose = "verification") {
             or if you did not request this code, please contact support.
             - The CommuNect Team
             malaluanaaron03@gmail.com
-            panganibanjannlaurence@gmail.com
-            `
+            panganibanjannlaurence@gmail.com`
     ].join("\r\n");
 
     const sendResponse = await fetch(
