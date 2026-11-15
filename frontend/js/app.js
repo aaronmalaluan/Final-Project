@@ -418,6 +418,7 @@ $("#registerForm").addEventListener("submit", async e => {
   } catch (err) { toast(err.message); }
 });
 $("#logoutBtn").addEventListener("click", async () => {
+  if (!window.confirm("Are you sure you want to log out?")) return;
   try { await api("/auth/logout", { method:"POST" }); } catch {}
   currentUser = null; updateAuthUI(); toast("You have logged out.");
 });
