@@ -85,11 +85,25 @@ async function sendVerificationCode(recipient, code, purpose = "verification") {
         isPasswordReset
             ? `Your password reset code is ${code}. It expires in 5 minutes. If you did not request a password reset, you can ignore this email.
             If you did not request this code, please contact support.
+
+
+
+
+
+
+
             - The CommuNect Team
             malaluanaaron03@gmail.com
             panganibanjannlaurence@gmail.com`
             : `Your verification code is ${code}. It expires in 5 minutes. If you did not try to log in, you can ignore this email.
             If you did not request this code, please contact support.
+
+
+
+
+
+
+            
             - The CommuNect Team
             malaluanaaron03@gmail.com
             panganibanjannlaurence@gmail.com`
