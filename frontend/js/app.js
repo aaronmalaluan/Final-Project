@@ -205,13 +205,13 @@ async function loadMyConcerns() {
   } catch (err) { box.innerHTML = `<div class="empty-state">${escapeHTML(err.message)}</div>`; }
 }
 async function loadEvents() {
-  renderListFromApi("/events", "#eventList", items => items.map(item => `<article class="content-card"><div class="meta">📅 ${formatDate(item.event_date || item.date)}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p>📍 ${escapeHTML(item.location || "Location to be announced")}</p><button class="btn btn-outline btn-small" data-event-register="${item.id}">Register interest</button>${renderDeleteButton("event", item.id)}</article>`).join(""));
+  renderListFromApi("/events", "#eventList", items => items.map(item => `<article class="content-card"><div class="meta">Event date · ${formatDate(item.event_date || item.date)}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "To be announced")}</p><button class="btn btn-outline btn-small" data-event-register="${item.id}">Register interest</button>${renderDeleteButton("event", item.id)}</article>`).join(""));
 }
 async function loadAssistance() {
   renderListFromApi("/assistance", "#assistanceList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.category || "Community program")}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Eligibility:</strong> ${escapeHTML(item.eligibility || "See program details")}</p><p><strong>Deadline:</strong> ${formatDate(item.deadline)}</p>${renderDeleteButton("assistance", item.id)}</article>`).join(""));
 }
 async function loadLostFound() {
-  renderListFromApi("/lost-found", "#lostFoundList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.item_status || item.status || "Listing")}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p>📍 ${escapeHTML(item.location || "Location not specified")}</p>${item.item_status === "Found" ? renderDeleteButton("foundListing", item.id) : ""}</article>`).join(""));
+  renderListFromApi("/lost-found", "#lostFoundList", items => items.map(item => `<article class="content-card"><div class="meta">${escapeHTML(item.item_status || item.status || "Listing")}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "Not specified")}</p>${item.item_status === "Found" ? renderDeleteButton("foundListing", item.id) : ""}</article>`).join(""));
 }
 async function renderListFromApi(path, selector, render) {
   const box = $(selector);
