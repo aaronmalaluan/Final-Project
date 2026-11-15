@@ -836,6 +836,21 @@ nav {
   box-shadow: 0 24px 70px rgba(8, 21, 45, 0.28);
   animation: confirm-enter 0.18s ease-out;
 }
+.logout-confirm-dialog {
+  border-top: 4px solid var(--primary);
+}
+.logout-confirm-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+.logout-confirm-dialog h2 {
+  margin-top: 0;
+  color: var(--primary-dark);
+}
 .confirm-icon {
   display: grid;
   width: 46px;

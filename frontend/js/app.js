@@ -6,6 +6,7 @@ let currentUser = null;
 let otpPurpose = null;
 let otpSent = false;
 let pendingDelete = null;
+let logoutTrigger = null;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -63,6 +64,17 @@ function closeDeleteConfirmation(restoreFocus = true) {
   const trigger = pendingDelete && pendingDelete.trigger;
   $("#deleteConfirmModal").classList.add("hidden");
   pendingDelete = null;
+  if (restoreFocus && trigger && trigger.isConnected) trigger.focus();
+}
+function openLogoutConfirmation(trigger) {
+  logoutTrigger = trigger;
+  $("#logoutConfirmModal").classList.remove("hidden");
+  $("#logoutConfirmCancel").focus();
+}
+function closeLogoutConfirmation(restoreFocus = true) {
+  const trigger = logoutTrigger;
+  $("#logoutConfirmModal").classList.add("hidden");
+  logoutTrigger = null;
   if (restoreFocus && trigger && trigger.isConnected) trigger.focus();
 }
 function refreshAfterDelete(type) {
@@ -289,6 +301,10 @@ $("#deleteConfirmCancel").addEventListener("click", () => closeDeleteConfirmatio
 $("#deleteConfirmModal").addEventListener("click", e => {
   if (e.target.id === "deleteConfirmModal") closeDeleteConfirmation();
 });
+$("#logoutConfirmCancel").addEventListener("click", () => closeLogoutConfirmation());
+$("#logoutConfirmModal").addEventListener("click", e => {
+  if (e.target.id === "logoutConfirmModal") closeLogoutConfirmation();
+});
 $("#deleteConfirmDelete").addEventListener("click", async () => {
   if (!pendingDelete) return;
 
@@ -315,10 +331,24 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !$("#deleteConfirmModal").classList.contains("hidden")) {
     closeDeleteConfirmation();
   }
+  if (e.key === "Escape" && !$("#logoutConfirmModal").classList.contains("hidden")) {
+    closeLogoutConfirmation();
+  }
 });
 $("#officialLoginBtn").addEventListener("click", () => openAuth("login"));
 $("#modalClose").addEventListener("click", closeAuth);
-$("#authModal").addEventListener("click", e => { if (e.target.id === "authModal") closeAuth(); });
+let authBackdropPointerDown = false;
+$("#authModal").addEventListener("pointerdown", e => {
+  authBackdropPointerDown = e.button === 0 && e.target === e.currentTarget;
+});
+$("#authModal").addEventListener("pointerup", e => {
+  const clickedBackdrop = authBackdropPointerDown && e.target === e.currentTarget;
+  authBackdropPointerDown = false;
+  if (clickedBackdrop) closeAuth();
+});
+$("#authModal").addEventListener("pointercancel", () => {
+  authBackdropPointerDown = false;
+});
 $$(".auth-tab").forEach(tab => tab.addEventListener("click", () => setAuthTab(tab.dataset.auth)));
 $("#forgotPasswordOpen").addEventListener("click", () => {
   $("#forgotPasswordEmail").value = $("#loginForm input[name='email']").value;
@@ -476,10 +506,22 @@ $("#registerForm").addEventListener("submit", async e => {
     toast(result.message);
   } catch (err) { toast(err.message); }
 });
-$("#logoutBtn").addEventListener("click", async () => {
-  if (!window.confirm("Are you sure you want to log out?")) return;
-  try { await api("/auth/logout", { method:"POST" }); } catch {}
-  currentUser = null; updateAuthUI(); toast("You have logged out.");
+$("#logoutBtn").addEventListener("click", () => {
+  openLogoutConfirmation($("#logoutBtn"));
+});
+$("#logoutConfirmProceed").addEventListener("click", async () => {
+  const confirmButton = $("#logoutConfirmProceed");
+  confirmButton.disabled = true;
+  confirmButton.textContent = "Logging out...";
+  try {
+    await api("/auth/logout", { method: "POST" });
+  } catch {}
+  closeLogoutConfirmation(false);
+  currentUser = null;
+  updateAuthUI();
+  toast("You have logged out.");
+  confirmButton.disabled = false;
+  confirmButton.textContent = "Log out";
 });
 
 $("#concernForm").addEventListener("submit", async e => {

@@ -715,6 +715,30 @@
         </div>
       </div>
     </div>
+    <div
+      class="confirm-backdrop hidden"
+      id="logoutConfirmModal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="logoutConfirmTitle"
+      aria-describedby="logoutConfirmMessage"
+    >
+      <div class="confirm-dialog logout-confirm-dialog">
+        <span class="logout-confirm-label">ACCOUNT</span>
+        <h2 id="logoutConfirmTitle">Log out of CommuNect?</h2>
+        <p id="logoutConfirmMessage">
+          You can sign back in anytime with your account.
+        </p>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" id="logoutConfirmCancel" type="button">
+            Stay logged in
+          </button>
+          <button class="btn btn-primary" id="logoutConfirmProceed" type="button">
+            Log out
+          </button>
+        </div>
+      </div>
+    </div>
     <div id="toast" class="toast" role="status"></div>
     <script src="js/app.js?v=20261115-password-reset"></script>
   </body>
