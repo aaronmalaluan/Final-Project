@@ -806,6 +806,11 @@ $("#eventForm").addEventListener("submit", async (e) => {
     toast(err.message);
   }
 });
+const eventDateInput = $("#eventForm input[name='event_date']");
+eventDateInput.addEventListener("input", () => {
+  const match = eventDateInput.value.match(/^(\d{5,})-(.*)$/);
+  if (match) eventDateInput.value = `${match[1].slice(0, 4)}-${match[2]}`;
+});
 $("#assistanceForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
