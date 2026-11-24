@@ -71,10 +71,52 @@ function renderDeleteButton(type, id) {
     return "";
   return `<button class="btn btn-outline btn-small btn-delete" data-delete-type="${type}" data-delete-id="${escapeHTML(id)}">Delete</button>`;
 }
+function filterSearchResults(input) {
+  const box = $(input.dataset.searchTarget);
+  if (!box) return;
+
+  const query = input.value.trim().toLowerCase();
+  const emptyMessage = box.querySelector(".search-empty-state");
+  if (emptyMessage) emptyMessage.remove();
+
+  const items = [...box.children].filter((item) =>
+    item.matches(input.dataset.searchItems),
+  );
+  if (!items.length) return;
+
+  let matches = 0;
+  items.forEach((item) => {
+    const searchable = item.cloneNode(true);
+    searchable.querySelectorAll("button").forEach((button) => button.remove());
+    searchable.querySelectorAll("select").forEach((select) => {
+      const selectedOption = select.options[select.selectedIndex];
+      if (selectedOption) select.replaceWith(selectedOption.textContent);
+      else select.remove();
+    });
+    const isMatch =
+      !query || searchable.textContent.toLowerCase().includes(query);
+    item.classList.toggle("search-hidden", !isMatch);
+    if (isMatch) matches += 1;
+  });
+
+  if (query && !matches) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state search-empty-state";
+    empty.textContent = `No results found for "${input.value.trim()}".`;
+    box.append(empty);
+  }
+}
+function applySearchToTarget(target) {
+  const input = $$("[data-search-target]").find(
+    (field) => field.dataset.searchTarget === target,
+  );
+  if (input) filterSearchResults(input);
+}
 function openDeleteConfirmation(type, id, trigger) {
   pendingDelete = { type, id, trigger };
+  $("#deleteConfirmTitle").textContent = `Delete this ${DELETE_LABELS[type]}?`;
   $("#deleteConfirmMessage").textContent =
-    `Delete this ${DELETE_LABELS[type]}? This action cannot be undone.`;
+    "This action cannot be undone. The item will be removed permanently.";
   $("#deleteConfirmModal").classList.remove("hidden");
   $("#deleteConfirmCancel").focus();
 }
@@ -263,6 +305,7 @@ async function loadAnnouncements() {
             .join("")
         : '<div class="empty-state">No announcements have been posted yet.</div>';
     targets.forEach((el) => (el.innerHTML = html));
+    applySearchToTarget("#announcementList");
   } catch (err) {
     targets.forEach(
       (el) =>
@@ -305,6 +348,7 @@ async function loadMyConcerns() {
             )
             .join("")
         : `<div class="empty-state">${canViewAll ? "No concern reports have been submitted yet." : "You have not submitted any concerns yet."}</div>`;
+    applySearchToTarget("#myConcernList");
   } catch (err) {
     box.innerHTML = `<div class="empty-state">${escapeHTML(err.message)}</div>`;
   }
@@ -357,6 +401,7 @@ async function renderListFromApi(path, selector, render) {
       Array.isArray(items) && items.length
         ? render(items)
         : '<div class="empty-state">Nothing has been posted yet.</div>';
+    applySearchToTarget(selector);
   } catch (err) {
     box.innerHTML = `<div class="empty-state">${escapeHTML(err.message)}<br>HTTP 404: Not Found</div>`;
   }
@@ -431,6 +476,7 @@ async function loadDashboard() {
       html || '<div class="empty-state">No concerns found.</div>';
     $("#manageConcernList").innerHTML =
       html || '<div class="empty-state">No concerns found.</div>';
+    applySearchToTarget("#manageConcernList");
   } catch (err) {
     const error = `<div class="empty-state">${escapeHTML(err.message)}</div>`;
     $("#officialConcernList").innerHTML = error;
@@ -530,7 +576,7 @@ $("#deleteConfirmDelete").addEventListener("click", async () => {
     toast(err.message);
   } finally {
     confirmButton.disabled = false;
-    confirmButton.textContent = "Delete";
+    confirmButton.textContent = "Delete permanently";
   }
 });
 document.addEventListener("keydown", (e) => {
@@ -907,6 +953,9 @@ document.addEventListener("click", async (e) => {
   }
 });
 $("#year").textContent = new Date().getFullYear();
+$$("[data-search-target]").forEach((input) => {
+  input.addEventListener("input", () => filterSearchResults(input));
+});
 checkSession().then(() => {
   loadAnnouncements();
 });

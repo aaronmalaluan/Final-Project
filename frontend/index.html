@@ -188,6 +188,16 @@
               </p>
             </div>
           </div>
+          <div class="list-search">
+            <label for="announcementSearch">Search announcements</label>
+            <input
+              id="announcementSearch"
+              type="search"
+              data-search-target="#announcementList"
+              data-search-items=".content-card"
+              placeholder="Search titles, categories, or details"
+            />
+          </div>
           <div id="announcementList" class="content-grid">
             <div class="empty-state">Loading announcements...</div>
           </div>
@@ -292,6 +302,16 @@
               </p>
             </div>
           </div>
+          <div class="list-search">
+            <label for="concernSearch">Search concern reports</label>
+            <input
+              id="concernSearch"
+              type="search"
+              data-search-target="#myConcernList"
+              data-search-items=".list-item"
+              placeholder="Search titles, locations, status, or details"
+            />
+          </div>
           <div id="myConcernList" class="stack-list">
             <div class="empty-state">Log in to view your concerns.</div>
           </div>
@@ -315,6 +335,16 @@
                 Find an activity and participate in your community.
               </p>
             </div>
+          </div>
+          <div class="list-search">
+            <label for="eventSearch">Search events</label>
+            <input
+              id="eventSearch"
+              type="search"
+              data-search-target="#eventList"
+              data-search-items=".content-card"
+              placeholder="Search event names, locations, or details"
+            />
           </div>
           <div id="eventList" class="content-grid">
             <div class="empty-state">Loading events...</div>
@@ -363,6 +393,16 @@
           <div class="info-strip">
             Always review the eligibility requirements, required documents, and
             application deadline provided in each program announcement.
+          </div>
+          <div class="list-search">
+            <label for="assistanceSearch">Search assistance programs</label>
+            <input
+              id="assistanceSearch"
+              type="search"
+              data-search-target="#assistanceList"
+              data-search-items=".content-card"
+              placeholder="Search program names, eligibility, or details"
+            />
           </div>
           <div id="assistanceList" class="content-grid">
             <div class="empty-state">Loading programs...</div>
@@ -448,6 +488,16 @@
         <div class="section-wrap">
           <div class="section-heading">
             <div><h2>Recent listings</h2></div>
+          </div>
+          <div class="list-search">
+            <label for="lostFoundSearch">Search lost and found</label>
+            <input
+              id="lostFoundSearch"
+              type="search"
+              data-search-target="#lostFoundList"
+              data-search-items=".content-card"
+              placeholder="Search item names, locations, or descriptions"
+            />
           </div>
           <div id="lostFoundList" class="content-grid">
             <div class="empty-state">Loading listings...</div>
@@ -561,6 +611,16 @@
             </div>
             <div class="form-card dashboard-table-wrap">
               <h3>Manage concerns</h3>
+              <div class="list-search">
+                <label for="manageConcernSearch">Search concern reports</label>
+                <input
+                  id="manageConcernSearch"
+                  type="search"
+                  data-search-target="#manageConcernList"
+                  data-search-items=".list-item"
+                  placeholder="Search titles, residents, or details"
+                />
+              </div>
               <div id="manageConcernList" class="stack-list"></div>
             </div>
             <div class="form-card dashboard-table-wrap">
@@ -725,16 +785,21 @@
       aria-labelledby="deleteConfirmTitle"
       aria-describedby="deleteConfirmMessage"
     >
-      <div class="confirm-dialog">
-        <div class="confirm-icon" aria-hidden="true">!</div>
-        <h2 id="deleteConfirmTitle">Confirm deletion</h2>
-        <p id="deleteConfirmMessage"></p>
+      <div class="confirm-dialog delete-confirm-dialog">
+        <div class="delete-confirm-header">
+          <div class="confirm-icon" aria-hidden="true">!</div>
+          <span class="delete-confirm-label">PERMANENT ACTION</span>
+        </div>
+        <div class="delete-confirm-copy">
+          <h2 id="deleteConfirmTitle">Confirm deletion</h2>
+          <p id="deleteConfirmMessage"></p>
+        </div>
         <div class="confirm-actions">
           <button class="btn btn-outline" id="deleteConfirmCancel" type="button">
-            Cancel
+            Keep item
           </button>
           <button class="btn btn-danger" id="deleteConfirmDelete" type="button">
-            Delete
+            Delete permanently
           </button>
         </div>
       </div>

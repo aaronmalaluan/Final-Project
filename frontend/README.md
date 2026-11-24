@@ -55,6 +55,8 @@ Recommended: in VS Code, install the **Live Server** extension.
 
 Do not open the HTML file by double-clicking it if you are using session login. Use Live Server.
 
+Keyword search filters the loaded announcements, concern reports, events, assistance programs, and lost-and-found listings.
+
 ## Public deployment
 
 Deploy both folders using the steps in [the backend Render deployment guide](../backend/README.md#deploy-the-complete-app-on-render). Open the Render service URL for the public app; GitHub Pages is a separate site and will not share the API's session cookie.
