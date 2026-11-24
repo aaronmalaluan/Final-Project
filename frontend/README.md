@@ -93,8 +93,10 @@ Deploy both folders using the steps in [the backend Render deployment guide](../
 | Official feedback list | GET | `/api/feedback` |
 | Dashboard summary | GET | `/api/analytics/overview` |
 | Concerns by category | GET | `/api/analytics/concerns` |
+| Event interest counts (official/admin) | GET | `/api/analytics/events` |
 
 Official concern and feedback routes require an authenticated official or administrator account.
+Event registrations are limited to one per account for each event.
 Content deletion requires an authenticated official or administrator account. Lost-and-found deletion only applies to listings marked `Found`.
 
 ## 6. Session and CORS settings

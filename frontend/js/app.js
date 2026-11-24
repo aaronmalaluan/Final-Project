@@ -155,6 +155,7 @@ function updateAuthUI() {
     isOfficial,
   );
   $("#dashboardContent").classList.toggle("hidden", !isOfficial);
+  if ($("#events").classList.contains("active-page")) loadEvents();
 }
 
 function openAuth(mode = "login") {
@@ -309,11 +310,13 @@ async function loadMyConcerns() {
   }
 }
 async function loadEvents() {
-  renderListFromApi("/events", "#eventList", (items) =>
+  return renderListFromApi("/events", "#eventList", (items) =>
     items
       .map(
-        (item) =>
-          `<article class="content-card"><div class="meta">Event date · ${formatDate(item.event_date || item.date)}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "To be announced")}</p><button class="btn btn-outline btn-small" data-event-register="${item.id}">Register interest</button>${renderDeleteButton("event", item.id)}</article>`,
+        (item) => {
+          const registered = Boolean(Number(item.has_registered));
+          return `<article class="content-card"><div class="meta">Event date · ${formatDate(item.event_date || item.date)}</div><h3>${escapeHTML(item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "To be announced")}</p><button class="btn btn-outline btn-small event-interest-btn" data-event-register="${escapeHTML(item.id)}"${registered ? " disabled" : ""}>${registered ? "Interest registered" : "Register interest"}</button>${renderDeleteButton("event", item.id)}</article>`;
+        },
       )
       .join(""),
   );
@@ -401,6 +404,22 @@ async function loadDashboard() {
   } catch {
     $("#categoryChart").textContent =
       "Category analytics endpoint is not available yet.";
+  }
+  try {
+    const result = await api("/analytics/events");
+    const rows = result.events || result.data || result || [];
+    $("#eventInterestList").innerHTML =
+      Array.isArray(rows) && rows.length
+        ? rows
+            .map(
+              (event) =>
+                `<div class="event-interest-row"><span>${escapeHTML(event.title)}</span><strong>${Number(event.participants || 0)} interested</strong></div>`,
+            )
+            .join("")
+        : '<div class="empty-state">No events have been posted yet.</div>';
+  } catch (err) {
+    $("#eventInterestList").innerHTML =
+      `<div class="empty-state">${escapeHTML(err.message)}</div>`;
   }
   try {
     const result = await api("/concerns");
@@ -842,13 +861,22 @@ document.addEventListener("click", async (e) => {
   const register = e.target.closest("[data-event-register]");
   if (register) {
     if (!currentUser) return openAuth("login");
+    register.disabled = true;
+    register.textContent = "Saving...";
     try {
       await api(`/events/${register.dataset.eventRegister}/register`, {
         method: "POST",
       });
       toast("Your event registration was recorded.");
+      loadEvents();
     } catch (err) {
       toast(err.message);
+      if (err.message === "You are already registered for this event.") {
+        loadEvents();
+      } else {
+        register.disabled = false;
+        register.textContent = "Register interest";
+      }
     }
   }
   const update = e.target.closest("[data-update-id]");

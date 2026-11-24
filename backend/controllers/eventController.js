@@ -31,12 +31,18 @@ exports.getAllEvents = async (req, res) => {
         const isOfficial = ['official', 'admin'].includes(req.session.role);
         const dateFilter = isOfficial ? '' : 'WHERE e.event_date >= NOW()';
         const [events] = await db.execute(
-            `SELECT e.*, COUNT(er.id) AS participant_count
+            `SELECT e.*, COUNT(er.id) AS participant_count,
+                    EXISTS (
+                        SELECT 1
+                        FROM event_registrations mine
+                        WHERE mine.event_id = e.id AND mine.user_id = ?
+                    ) AS has_registered
              FROM events e
              LEFT JOIN event_registrations er ON er.event_id = e.id
              ${dateFilter}
              GROUP BY e.id
-             ORDER BY e.event_date ASC`
+             ORDER BY e.event_date ASC`,
+            [req.session.userId || 0]
         );
 
         res.json(events);
@@ -53,12 +59,17 @@ exports.getEventById = async (req, res) => {
 
     try {
         const [events] = await db.execute(
-            `SELECT e.*, COUNT(er.id) AS participant_count
+            `SELECT e.*, COUNT(er.id) AS participant_count,
+                    EXISTS (
+                        SELECT 1
+                        FROM event_registrations mine
+                        WHERE mine.event_id = e.id AND mine.user_id = ?
+                    ) AS has_registered
              FROM events e
              LEFT JOIN event_registrations er ON er.event_id = e.id
              WHERE e.id = ?
              GROUP BY e.id`,
-            [req.params.id]
+            [req.session.userId || 0, req.params.id]
         );
 
         if (events.length === 0) {

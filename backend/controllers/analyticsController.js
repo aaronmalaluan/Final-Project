@@ -67,6 +67,7 @@ exports.getEventAnalytics = async (req, res) => {
     try {
         const [results] = await db.execute(`
             SELECT
+                e.id,
                 e.title,
                 COUNT(er.id) AS participants
             FROM events e
