@@ -113,6 +113,9 @@ function showPage(page) {
     el.classList.toggle("active", el.dataset.page === page),
   );
   $("#mainNav").classList.remove("open");
+  $("#navOverlay").classList.remove("open");
+  $("#menuToggle").setAttribute("aria-expanded", "false");
+  document.body.classList.remove("menu-open");
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (page === "announcements" || page === "home") loadAnnouncements();
   if (page === "concerns") loadMyConcerns();
@@ -457,9 +460,24 @@ $("#mainNav").addEventListener("click", (e) => {
 $$("[data-go]").forEach((b) =>
   b.addEventListener("click", () => showPage(b.dataset.go)),
 );
+function setMobileMenu(open) {
+  $("#mainNav").classList.toggle("open", open);
+  $("#navOverlay").classList.toggle("open", open);
+  $("#menuToggle").setAttribute("aria-expanded", String(open));
+  document.body.classList.toggle("menu-open", open);
+  if (open) $("#sidebarClose").focus();
+}
+$("#menuToggle").setAttribute("aria-expanded", "false");
 $("#menuToggle").addEventListener("click", () =>
-  $("#mainNav").classList.toggle("open"),
+  setMobileMenu(!$("#mainNav").classList.contains("open")),
 );
+$("#sidebarClose").addEventListener("click", () => setMobileMenu(false));
+$("#navOverlay").addEventListener("click", () => setMobileMenu(false));
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 820 && $("#mainNav").classList.contains("open")) {
+    setMobileMenu(false);
+  }
+});
 $("#loginOpen").addEventListener("click", () => openAuth("login"));
 $("#registerOpen").addEventListener("click", () => openAuth("register"));
 $("#deleteConfirmCancel").addEventListener("click", () =>
@@ -497,6 +515,10 @@ $("#deleteConfirmDelete").addEventListener("click", async () => {
   }
 });
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && $("#mainNav").classList.contains("open")) {
+    setMobileMenu(false);
+    $("#menuToggle").focus();
+  }
   if (
     e.key === "Escape" &&
     !$("#deleteConfirmModal").classList.contains("hidden")
