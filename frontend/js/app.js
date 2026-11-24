@@ -806,11 +806,14 @@ $("#eventForm").addEventListener("submit", async (e) => {
     toast(err.message);
   }
 });
-const eventDateInput = $("#eventForm input[name='event_date']");
-eventDateInput.addEventListener("input", () => {
-  const match = eventDateInput.value.match(/^(\d{5,})-(.*)$/);
-  if (match) eventDateInput.value = `${match[1].slice(0, 4)}-${match[2]}`;
-});
+function limitDateYear(input) {
+  input.addEventListener("input", () => {
+    const match = input.value.match(/^(\d{5,})-(.*)$/);
+    if (match) input.value = `${match[1].slice(0, 4)}-${match[2]}`;
+  });
+}
+limitDateYear($("#eventForm input[name='event_date']"));
+limitDateYear($("#lostFoundForm input[name='date_reported']"));
 $("#assistanceForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
