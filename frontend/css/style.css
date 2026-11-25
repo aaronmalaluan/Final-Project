@@ -768,6 +768,24 @@ nav {
   transform: none;
 }
 
+.button-spinner {
+  display: none;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+}
+
+.btn.is-loading .button-spinner {
+  display: inline-block;
+  animation: button-spin 0.7s linear infinite;
+}
+
+@keyframes button-spin {
+  to { transform: rotate(360deg); }
+}
+
 .otp-field {
   border: 0;
   min-width: 0;

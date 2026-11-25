@@ -695,6 +695,12 @@ $("#myConcernsBtn").addEventListener("click", async () => {
 
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const button = $("#loginSubmitBtn");
+  const buttonLabel = button.querySelector(".login-button-label");
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  button.classList.add("is-loading");
+  buttonLabel.textContent = "Logging in...";
   try {
     const result = await api("/auth/login", {
       method: "POST",
@@ -709,6 +715,11 @@ $("#loginForm").addEventListener("submit", async (e) => {
     showPage("home");
   } catch (err) {
     toast(err.message);
+  } finally {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.classList.remove("is-loading");
+    buttonLabel.textContent = "Log in";
   }
 });
 $("#forgotPasswordForm").addEventListener("submit", async (e) => {
