@@ -125,6 +125,11 @@ button {
   box-shadow: 0 8px 18px rgba(47, 93, 80, 0.22);
 }
 
+.brand-mark-image {
+  object-fit: contain;
+  padding: 3px;
+}
+
 nav {
   display: flex;
   align-items: center;
