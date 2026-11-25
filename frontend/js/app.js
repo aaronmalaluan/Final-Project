@@ -851,6 +851,12 @@ $("#announcementForm").addEventListener("submit", async (e) => {
 });
 $("#eventForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const eventDate = new Date($("#eventForm input[name='event_date']").value);
+  if (Number.isNaN(eventDate.getTime()) || eventDate.getTime() <= Date.now()) {
+    toast("Choose a future date and time for the event.");
+    return;
+  }
+
   try {
     await api("/events", {
       method: "POST",
@@ -863,6 +869,17 @@ $("#eventForm").addEventListener("submit", async (e) => {
     toast(err.message);
   }
 });
+function updateEventDateMinimum() {
+  const minimum = new Date();
+  minimum.setMinutes(minimum.getMinutes() + 1, 0, 0);
+  const pad = (value) => String(value).padStart(2, "0");
+  $("#eventForm input[name='event_date']").min =
+    `${minimum.getFullYear()}-${pad(minimum.getMonth() + 1)}-${pad(minimum.getDate())}` +
+    `T${pad(minimum.getHours())}:${pad(minimum.getMinutes())}`;
+}
+const eventDateInput = $("#eventForm input[name='event_date']");
+updateEventDateMinimum();
+eventDateInput.addEventListener("focus", updateEventDateMinimum);
 function limitDateYear(input) {
   input.addEventListener("input", () => {
     const match = input.value.match(/^(\d{5,})-(.*)$/);
