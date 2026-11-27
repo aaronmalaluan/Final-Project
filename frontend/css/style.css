@@ -644,6 +644,11 @@ nav {
 
 .lost-found-status-select {
   min-width: 120px;
+  border-radius: 14px;
+}
+
+.lost-found-actions .btn {
+  min-height: 40px;
 }
 
 .list-search {

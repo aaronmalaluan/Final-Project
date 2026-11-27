@@ -402,14 +402,18 @@ async function loadLostFound() {
           const canEditStatus =
             currentUser &&
             ["official", "admin"].includes(currentUser.role);
+          const deleteButton =
+            item.item_status === "Found"
+              ? renderDeleteButton("foundListing", item.id)
+              : "";
           const statusControl = canEditStatus
             ? `<div class="lost-found-actions"><select class="status-select lost-found-status-select" aria-label="Update lost and found status" data-lost-found-status-id="${escapeHTML(item.id)}">
                 <option ${status === "Lost" ? "selected" : ""}>Lost</option>
                 <option ${status === "Found" ? "selected" : ""}>Found</option>
                 <option ${status === "Returned" ? "selected" : ""}>Returned</option>
-              </select><button class="btn btn-outline btn-small" data-lost-found-update="${escapeHTML(item.id)}">Update</button></div>`
+              </select><button class="btn btn-outline btn-small" data-lost-found-update="${escapeHTML(item.id)}">Update</button>${deleteButton}</div>`
             : "";
-          return `<article class="content-card"><div class="meta lost-found-status ${statusClassName}">${escapeHTML(status)}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "Not specified")}</p>${statusControl}${item.item_status === "Found" ? renderDeleteButton("foundListing", item.id) : ""}</article>`;
+          return `<article class="content-card"><div class="meta lost-found-status ${statusClassName}">${escapeHTML(status)}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "Not specified")}</p>${statusControl || deleteButton}</article>`;
         },
       )
       .join(""),
