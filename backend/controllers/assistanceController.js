@@ -17,6 +17,25 @@ exports.createProgram = async (req, res) => {
     if (!title || !category || !description) {
         return res.status(400).json({ message: 'Title, category, and description are required.' });
     }
+    if (typeof deadline !== 'string' || !deadline.trim()) {
+        return res.status(400).json({ message: 'A deadline is required.' });
+    }
+
+    const deadlineDate = deadline.trim();
+    const parsedDeadline = new Date(`${deadlineDate}T00:00:00.000Z`);
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(deadlineDate) ||
+        Number.isNaN(parsedDeadline.getTime()) ||
+        parsedDeadline.toISOString().slice(0, 10) !== deadlineDate
+    ) {
+        return res.status(400).json({ message: 'Enter a valid deadline date.' });
+    }
+
+    const today = new Date();
+    const todayDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    if (deadlineDate < todayDate) {
+        return res.status(400).json({ message: 'The deadline cannot be in the past.' });
+    }
 
     try {
         const [result] = await db.execute(
@@ -29,7 +48,7 @@ exports.createProgram = async (req, res) => {
                 category.trim(),
                 description,
                 eligibility || null,
-                deadline || null
+                deadlineDate
             ]
         );
         res.status(201).json({ message: 'Assistance program published.', id: result.insertId });

@@ -943,6 +943,15 @@ function updateEventDateMinimum() {
 const eventDateInput = $("#eventForm input[name='event_date']");
 updateEventDateMinimum();
 eventDateInput.addEventListener("focus", updateEventDateMinimum);
+function updateAssistanceDeadlineMinimum() {
+  const today = new Date();
+  const pad = (value) => String(value).padStart(2, "0");
+  $("#assistanceForm input[name='deadline']").min =
+    `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+}
+const assistanceDeadlineInput = $("#assistanceForm input[name='deadline']");
+updateAssistanceDeadlineMinimum();
+assistanceDeadlineInput.addEventListener("focus", updateAssistanceDeadlineMinimum);
 function limitDateYear(input) {
   input.addEventListener("input", () => {
     const match = input.value.match(/^(\d{5,})-(.*)$/);
