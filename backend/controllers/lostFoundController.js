@@ -36,6 +36,38 @@ exports.createListing = async (req, res) => {
     }
 };
 
+exports.updateListingStatus = async (req, res) => {
+    const { id } = req.params;
+    const { item_status } = req.body;
+
+    if (!/^\d+$/.test(id) || Number(id) < 1) {
+        return res.status(400).json({ message: 'Invalid listing ID.' });
+    }
+    if (!['Lost', 'Found', 'Returned'].includes(item_status)) {
+        return res.status(400).json({ message: 'Status must be Lost, Found, or Returned.' });
+    }
+
+    try {
+        const [listings] = await db.execute(
+            `SELECT id FROM lost_found WHERE id = ?`,
+            [id]
+        );
+        if (!listings.length) {
+            return res.status(404).json({ message: 'Listing not found.' });
+        }
+
+        await db.execute(
+            `UPDATE lost_found SET item_status = ? WHERE id = ?`,
+            [item_status, id]
+        );
+
+        res.json({ message: 'Listing status updated.', item_status });
+    } catch (error) {
+        console.error('Update lost and found listing status error:', error);
+        res.status(500).json({ message: 'Unable to update the listing status.' });
+    }
+};
+
 exports.deleteFoundListing = async (req, res) => {
     const { id } = req.params;
     if (!/^\d+$/.test(id) || Number(id) < 1) {

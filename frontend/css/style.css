@@ -614,6 +614,38 @@ nav {
   letter-spacing: 0.9px;
 }
 
+.content-card .lost-found-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--muted);
+}
+
+.content-card .lost-found-status.lost {
+  background: #d93636;
+}
+
+.content-card .lost-found-status.found {
+  background: #1d8f4e;
+}
+
+.content-card .lost-found-status.returned {
+  background: #2874b9;
+}
+
+.lost-found-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.lost-found-status-select {
+  min-width: 120px;
+}
+
 .list-search {
   width: min(100%, 480px);
   margin: 0 0 16px;

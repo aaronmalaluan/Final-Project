@@ -396,8 +396,21 @@ async function loadLostFound() {
   renderListFromApi("/lost-found", "#lostFoundList", (items) =>
     items
       .map(
-        (item) =>
-          `<article class="content-card"><div class="meta">${escapeHTML(item.item_status || item.status || "Listing")}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "Not specified")}</p>${item.item_status === "Found" ? renderDeleteButton("foundListing", item.id) : ""}</article>`,
+        (item) => {
+          const status = item.item_status || item.status || "Lost";
+          const statusClassName = statusClass(status);
+          const canEditStatus =
+            currentUser &&
+            ["official", "admin"].includes(currentUser.role);
+          const statusControl = canEditStatus
+            ? `<div class="lost-found-actions"><select class="status-select lost-found-status-select" aria-label="Update lost and found status" data-lost-found-status-id="${escapeHTML(item.id)}">
+                <option ${status === "Lost" ? "selected" : ""}>Lost</option>
+                <option ${status === "Found" ? "selected" : ""}>Found</option>
+                <option ${status === "Returned" ? "selected" : ""}>Returned</option>
+              </select><button class="btn btn-outline btn-small" data-lost-found-update="${escapeHTML(item.id)}">Update</button></div>`
+            : "";
+          return `<article class="content-card"><div class="meta lost-found-status ${statusClassName}">${escapeHTML(status)}</div><h3>${escapeHTML(item.item_name || item.title)}</h3><p>${escapeHTML(item.description || "")}</p><p><strong>Location:</strong> ${escapeHTML(item.location || "Not specified")}</p>${statusControl}${item.item_status === "Found" ? renderDeleteButton("foundListing", item.id) : ""}</article>`;
+        },
       )
       .join(""),
   );
@@ -978,6 +991,25 @@ $("#feedbackForm").addEventListener("submit", async (e) => {
   }
 });
 document.addEventListener("click", async (e) => {
+  const lostFoundUpdate = e.target.closest("[data-lost-found-update]");
+  if (lostFoundUpdate) {
+    const id = lostFoundUpdate.dataset.lostFoundUpdate;
+    const itemStatus = lostFoundUpdate
+      .closest(".lost-found-actions")
+      .querySelector("[data-lost-found-status-id]").value;
+    try {
+      await api(`/lost-found/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ item_status: itemStatus }),
+      });
+      toast("Lost and found status updated.");
+      loadLostFound();
+    } catch (err) {
+      toast(err.message);
+    }
+    return;
+  }
+
   const deleteButton = e.target.closest("[data-delete-type]");
   if (deleteButton) {
     const type = deleteButton.dataset.deleteType;
