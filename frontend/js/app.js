@@ -276,6 +276,23 @@ function fillOtpDigits(startIndex, value) {
   );
   inputs[nextEmpty === -1 ? inputs.length - 1 : nextEmpty].focus();
 }
+function updateResetOtpValue() {
+  $("#resetPasswordOtp").value = $$(".reset-otp-digit")
+    .map((input) => input.value)
+    .join("");
+}
+function fillResetOtpDigits(startIndex, value) {
+  const inputs = $$(".reset-otp-digit");
+  const digits = value.replace(/\D/g, "").slice(0, inputs.length - startIndex);
+  for (let index = startIndex; index < inputs.length; index += 1) {
+    inputs[index].value = digits[index - startIndex] || "";
+  }
+  updateResetOtpValue();
+  const nextEmpty = inputs.findIndex(
+    (input, index) => index >= startIndex && !input.value,
+  );
+  inputs[nextEmpty === -1 ? inputs.length - 1 : nextEmpty].focus();
+}
 
 async function checkSession() {
   try {
@@ -661,6 +678,35 @@ $$(".otp-digit").forEach((input, index, inputs) => {
     fillOtpDigits(index, value);
   });
 });
+$$(".reset-otp-digit").forEach((input, index, inputs) => {
+  input.addEventListener("input", () => {
+    const value = input.value.replace(/\D/g, "");
+    if (value.length > 1) {
+      fillResetOtpDigits(index, value);
+      return;
+    }
+    input.value = value;
+    updateResetOtpValue();
+    if (value && inputs[index + 1]) inputs[index + 1].focus();
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Backspace" && !input.value && inputs[index - 1]) {
+      inputs[index - 1].focus();
+    } else if (event.key === "ArrowLeft" && inputs[index - 1]) {
+      event.preventDefault();
+      inputs[index - 1].focus();
+    } else if (event.key === "ArrowRight" && inputs[index + 1]) {
+      event.preventDefault();
+      inputs[index + 1].focus();
+    }
+  });
+  input.addEventListener("paste", (event) => {
+    const value = event.clipboardData.getData("text").replace(/\D/g, "");
+    if (!value) return;
+    event.preventDefault();
+    fillResetOtpDigits(index, value);
+  });
+});
 $("#sendOtpBtn").addEventListener("click", async () => {
   if (otpPurpose !== "register") return;
   const button = $("#sendOtpBtn");
@@ -735,7 +781,7 @@ $("#forgotPasswordForm").addEventListener("submit", async (e) => {
     $("#resetPasswordDescription").textContent = result.message;
     $("#forgotPasswordForm").classList.add("hidden");
     $("#resetPasswordForm").classList.remove("hidden");
-    $("#resetPasswordForm input[name='otp']").focus();
+    $(".reset-otp-digit").focus();
     toast(result.message);
   } catch (err) {
     toast(err.message);

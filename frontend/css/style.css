@@ -812,7 +812,8 @@ nav {
   gap: 8px;
 }
 
-.auth-form input.otp-digit {
+.auth-form input.otp-digit,
+.auth-form input.reset-otp-digit {
   height: 52px;
   padding: 8px 4px;
   text-align: center;
